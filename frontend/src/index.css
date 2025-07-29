@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+::before,
+::after{
+  box-sizing: border-box;
+}
+.bg-grad {
+  background-image: url('/images/imagebg.jpg');
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  min-height: 400px;
+}
+
+.bg-contact {
+  background-image: url('/images/image1.jpg');
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  min-height: 70vh;
+}
+
+.overlay {
+  background-color: rgba(10, 10, 223, 0.7);
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.overlay-contact{
+  background-color: rgba(17, 17, 17, 0.7);
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+
+.scroll-up-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+  
+  .scroll-up-button.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+ 
+
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms, transform 200ms;
+}
+.dropdown-exit {
+  opacity: 1;
+}
+.dropdown-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 200ms, transform 200ms;
+}
