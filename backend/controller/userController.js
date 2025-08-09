@@ -19,7 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Please fill in all fields');
   }
-
+//check if user exits
   const userExists = await User.findOne({ email });
 
   if (userExists) {
@@ -29,7 +29,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // hashed password
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt); // FIXED
+  const hashedPassword = await bcrypt.hash(password, salt); 
 
   // create user
   const user = await User.create({
