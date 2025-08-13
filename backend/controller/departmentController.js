@@ -13,15 +13,20 @@ const getDepartments = asyncHandler(async (req, res) => {
 // @route   POST /api/departments
 // @access  Private
 const createDepartment = asyncHandler(async (req, res) => {
-  const { departmentName } = req.body;
+  const { departmentName,  totalCreditUnitPerSession, 
+    minCreditUnitPerSemester, maxCreditUnitPerSemester } = req.body;
 
-  if (!departmentName) {
+  if (!departmentName || !totalCreditUnitPerSession || 
+    !minCreditUnitPerSemester || !maxCreditUnitPerSemester) {
     res.status(400);
     throw new Error('Please fill in all fields');
   }
 
   const department = await Department.create({
     departmentName,
+    totalCreditUnitPerSession,
+    minCreditUnitPerSemester,
+    maxCreditUnitPerSemester,
     user: req.user.id,
   });
 

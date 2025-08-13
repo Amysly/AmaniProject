@@ -7,7 +7,6 @@ const {getCourses,
 
 const {protect} = require('../middleware/authMiddleWare')
 
-
  router.route('/')
   .get( getCourses)
   .post(protect, createCourse);

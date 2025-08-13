@@ -4,7 +4,7 @@ const Department = require('../models/departmentModel');
 const Course = require('../models/courseModel');
 
 const registerCourses = asyncHandler(async (req, res) => {
-    const { session, semester, level, department: departmentId, courses } = req.body;
+    let { session, semester, level, department: departmentId, courses } = req.body;
 
     if (!session || !semester || !level || !departmentId || !courses || !courses.length) {
         res.status(400);
@@ -32,6 +32,11 @@ const registerCourses = asyncHandler(async (req, res) => {
         throw new Error("Department not found");
     }
 
+    //if it is a string parse it.
+    if (typeof courses === 'string') {
+        courses = JSON.parse(courses)
+        
+    }
     // Fetch selected courses
     const selectedCourses = await Course.find({ _id: { $in: courses } });
 

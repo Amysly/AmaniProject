@@ -13,6 +13,10 @@ const getCourses = asyncHandler(async (req, res) => {
 // @route   POST /api/courses
 // @access  Private
 const createCourse = asyncHandler(async (req, res) => {
+    if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error("Access denied, Admin only");
+  }
     const { courseTitle, courseCode, courseUnit, department } = req.body;
 
     if (!courseTitle || !courseCode || !courseUnit ||  !department) {
@@ -59,6 +63,10 @@ const updateCourse = asyncHandler(async (req, res) => {
 // @route   DELETE /api/courses/:id
 // @access  Private
 const deleteCourse = asyncHandler(async (req, res) => {
+    if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error("Access denied, Admin only");
+  }
     const course = await Course.findById(req.params.id);
 
     if (!course) {

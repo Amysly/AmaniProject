@@ -10,12 +10,11 @@ const generateToken = (id) => {
 };
 
 // @desc    Register a new user
-// @route   POST /api/users
-// @access  Public
+// @route   POST /api/user
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password ) {
     res.status(400);
     throw new Error('Please fill in all fields');
   }
