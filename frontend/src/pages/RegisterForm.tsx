@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { register, reset } from '../feature/auth/authslice';
 import Spinner from '../components/Spinner';
 
-
+interface RegisterForm{
+  name: string,
+  email: string,
+  password: string,
+  password2: string
+}
 const RegisterForm: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterForm>({
     name: '',
     email: '',
     password: '',
@@ -17,10 +22,11 @@ const RegisterForm: React.FC = () => {
   const { name, email, password, password2 } = formData;
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const { user, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
-
+const { user, isLoading, isError, isSuccess, message } = useAppSelector(
+    (state) => state.auth
+  );
 
   useEffect(() => {
     if (isError) {

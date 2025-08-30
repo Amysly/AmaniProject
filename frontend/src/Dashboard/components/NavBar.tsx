@@ -1,11 +1,13 @@
 import React, { useState} from 'react';
 import { FaBars, FaUser } from 'react-icons/fa';
+import { useSelector} from 'react-redux'
 
-type HandleSideBar ={
+interface HandleSideBar{
   handleSideBar : () => void
 }
 
 const NavBar: React.FC<HandleSideBar>= ({ handleSideBar }) => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const [showAdminIcons, setShowAdminIcons] = useState(false);
 
   function handleAdminIcons() {
@@ -21,7 +23,7 @@ const NavBar: React.FC<HandleSideBar>= ({ handleSideBar }) => {
             <div className="mt-1 cursor-pointer">
               <FaBars onClick={handleSideBar} size={24} />
             </div>
-            <h2 className="lg:text-xl sm:text-lg">Hi Student</h2>
+            <h2 className="lg:text-xl sm:text-lg">{user && user.name}</h2>
           </div>
           <div className="text-lg pr-2">
             <FaUser onClick={handleAdminIcons} size={24} />

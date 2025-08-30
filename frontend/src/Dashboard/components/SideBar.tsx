@@ -17,29 +17,25 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
       transform transition-transform duration-300 ease-in-out
       ${showSideBar ? 'translate-x-0' : '-translate-x-full'}
     `}>
-      <h2 className="text-2xl font-bold mt-10">Admin Dashboard</h2>
+      <h2 className="text-2xl font-bold mt-10">Student</h2>
       <nav className="mt-10">
         <ul>
           <li className="mt-5 mb-5">
-             <NavLink to="/" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })}
-             p-2 hover:bg-gray-700 rounded`}>
-              HOME
-            </NavLink>
             <NavLink to="/dashboard" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })}
              p-2 hover:bg-gray-700 rounded`}>
-              Dashboard
+              Profile
             </NavLink>
           </li>
           <li className="mt-5 mb-5">
             <NavLink to="/users" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })} 
             p-2 hover:bg-gray-700 rounded`}>
-              Users
+              Courses
             </NavLink>
           </li>
           <li className="mt-5 mb-5">
             <NavLink to="/setting" className={({ isActive }:{ isActive: boolean }) => `${LinkClass({ isActive })}
              p-2 hover:bg-gray-700 rounded`}>
-              Setting
+              Course Reg
             </NavLink>
           </li>
         </ul>

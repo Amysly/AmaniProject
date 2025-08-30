@@ -13,6 +13,10 @@ const getDepartments = asyncHandler(async (req, res) => {
 // @route   POST /api/departments
 // @access  Private
 const createDepartment = asyncHandler(async (req, res) => {
+    if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error("Access denied, Admin only");
+  }
   const { departmentName,  totalCreditUnitPerSession, 
     minCreditUnitPerSemester, maxCreditUnitPerSemester } = req.body;
 
@@ -37,6 +41,10 @@ const createDepartment = asyncHandler(async (req, res) => {
 // @route   PUT /api/departments/:id
 // @access  Private
 const updateDepartment = asyncHandler(async (req, res) => {
+    if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error("Access denied, Admin only");
+  }
   const department = await Department.findById(req.params.id);
 
   if (!department) {
@@ -60,6 +68,10 @@ const updateDepartment = asyncHandler(async (req, res) => {
 // @route   DELETE /api/departments/:id
 // @access  Private
 const deleteDepartment = asyncHandler(async (req, res) => {
+    if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error("Access denied, Admin only");
+  }
   const department = await Department.findById(req.params.id);
 
   if (!department) {
