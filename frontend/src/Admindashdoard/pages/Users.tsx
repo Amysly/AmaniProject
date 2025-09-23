@@ -1,29 +1,70 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaExclamationCircle, FaTimes } from "react-icons/fa";
-import tableDatas from "./tableData";
+import { getUsers, deleteUser } from "../../feature/auth/authslice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import Spinner from "../../components/Spinner";
 import AddUser from "./AddUser";
+import UpdateUser from "./UpdateUser";
 
-
+interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+}
 
 const Users: React.FC = () => {
-  const [showRemoveModal, setShowRemoveModal] = useState<boolean>(false);
-  const [showAddUserModal, setShowAddUserModal] = useState<boolean>(false);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showUpdateUserModal, setShowUpdateUserModal] = useState(false);
 
-  const handleClickRemoveUser = () => {
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+
+  const dispatch = useAppDispatch();
+  const { users, isLoading } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(getUsers());
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  // REMOVE USER HANDLERS
+  const handleClickRemoveUser = (id: string) => {
+    setSelectedUserId(id);
     setShowRemoveModal(true);
   };
 
   const handleCancelRemove = () => {
     setShowRemoveModal(false);
+    setSelectedUserId(null);
   };
 
   const handleConfirmRemove = () => {
-    alert("user removed");
-    setShowRemoveModal(false);
+    if (selectedUserId) {
+      dispatch(deleteUser(selectedUserId));
+      alert("User removed");
+      setShowRemoveModal(false);
+      setSelectedUserId(null);
+    }
   };
 
+  // ADD USER HANDLER
   const handleAddUserForm = () => {
     setShowAddUserModal(!showAddUserModal);
+  };
+
+  // UPDATE USER HANDLERS
+  const handleUpdateUserForm = (user: UserData) => {
+    setSelectedUser(user);
+    setShowUpdateUserModal(true);
+  };
+
+  const handleCloseUpdateUser = () => {
+    setShowUpdateUserModal(false);
+    setSelectedUser(null);
   };
 
   return (
@@ -44,43 +85,59 @@ const Users: React.FC = () => {
         <div>
           <button
             onClick={handleAddUserForm}
-            className="bg-blue-700 px-4 py-2 text-white rounded-md hover:bg-blue-800 transition flex items-center gap-2"
+            className="bg-blue-700 px-4 py-2 text-white rounded-md hover:bg-blue-800 
+            transition flex items-center gap-2"
           >
             <FaEdit /> Add User
           </button>
         </div>
       </div>
 
+      {/* Users Table */}
       <div className="mt-10 mb-3">
-        <h2 className="text-xl font-bold mb-3">All Students</h2>
+        <h2 className="text-xl font-bold mb-3 text-center">All Students</h2>
         <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-800 text-white">
             <tr>
-              <th className="p-2">Order ID</th>
               <th className="p-2">NAME</th>
               <th className="p-2">EMAIL</th>
               <th className="p-2">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
-            {tableDatas.map((user) => (
-              <tr key={user.id} className="text-center border-b">
-                <td className="p-2">{user.orderId}</td>
-                <td className="p-2">{user.name}</td>
-                <td className="p-2">{user.email}</td>
-                <td className="p-3 space-x-2 flex justify-center">
-                  <button className="flex items-center gap-1 bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800">
-                    <FaEdit /> Edit User
-                  </button>
-                  <button
-                    onClick={handleClickRemoveUser}
-                    className="flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                  >
-                    <FaTrash /> Delete User
-                  </button>
+            {users.length > 0 ? (
+              users.map((user: UserData) => (
+                <tr key={user._id} className="text-center border-b">
+                  <td className="p-2">{user.name}</td>
+                  <td className="p-2">{user.email}</td>
+                  <td className="p-3 space-x-2 flex justify-center">
+                    <button
+                      onClick={() => handleUpdateUserForm(user)}
+                      className="flex items-center gap-1 bg-blue-700 text-white px-3 py-1
+                     rounded hover:bg-blue-800"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleClickRemoveUser(user._id)}
+                      className="flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded
+                     hover:bg-red-700"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="text-center text-sm text-slate-500 py-2"
+                >
+                  user not found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -128,6 +185,11 @@ const Users: React.FC = () => {
 
       {/* ADD USER MODAL */}
       {showAddUserModal && <AddUser onClose={handleAddUserForm} />}
+
+      {/* UPDATE USER MODAL */}
+      {showUpdateUserModal && selectedUser && (
+        <UpdateUser user={selectedUser} onClose={handleCloseUpdateUser} />
+      )}
     </>
   );
 };

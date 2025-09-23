@@ -12,29 +12,30 @@ const generateToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/user
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body; 
 
-  if (!name || !email || !password ) {
+  if (!name || !email || !password) {
     res.status(400);
     throw new Error('Please fill in all fields');
   }
-//check if user exits
-  const userExists = await User.findOne({ email });
 
+  // check if user exists
+  const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
   }
 
-  // hashed password
+  // hash password
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt); 
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-  // create user
+  
   const user = await User.create({
     name,
     email,
     password: hashedPassword,
+    role, 
   });
 
   if (user) {
@@ -42,6 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role, // send role back in response too
       token: generateToken(user._id),
     });
   } else {
@@ -60,6 +62,7 @@ const login = asyncHandler(async (req, res) => {
             _id:user.id,
             name:user.name,
             email:user.email,
+             role: user.role,
             token:generateToken(user._id)
         })
     }else{

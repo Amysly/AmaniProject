@@ -20,6 +20,8 @@ import Login from './pages/Login';
 import MainLayout from './Layout/MainLayout';
 import Home from './pages/Home';
 import Courses from './pages/Courses';
+import ViewDepartments from './Admindashdoard/pages/ViewDepartments';
+
 
 // Student Dashboard Pages
 import DashBoard from './Dashboard/components/DashBoard';
@@ -68,7 +70,7 @@ const App: React.FC = () => {
       {/* Admin Dashboard Routes */}
         <Route element={<AdminMainLayout />}>
           <Route>
-              <Route path="/" element={<AdminDashBoard/>} />
+              <Route path="/admin-dashboard" element={<AdminDashBoard/>} />
               <Route path="/users" element={<Users />} />
               <Route path="/setting" element={<Settings />} />
               <Route path="/resultentry" element={<ResultsEntry />} />
@@ -76,6 +78,7 @@ const App: React.FC = () => {
                <Route path="/assign-roles" element={<RolesForm />} />
                <Route path="/permission" element={<PermissionsTable />} />
                <Route path="/departments" element={<Department />} />
+                <Route path="/all-departments" element={<ViewDepartments />} />
                <Route path="/courses" element={<Courses/>} />
             </Route>
         </Route>

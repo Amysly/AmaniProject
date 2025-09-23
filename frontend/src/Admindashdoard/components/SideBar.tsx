@@ -75,6 +75,16 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
                 </li>
                 <li>
                   <NavLink
+                    to="/all-departments"
+                    className={({ isActive }: NavLinkProps) =>
+                      `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700`
+                    }
+                  >
+                     All Departments
+                  </NavLink>
+                </li>
+                                <li>
+                  <NavLink
                     to="/courses"
                     className={({ isActive }: NavLinkProps) =>
                       `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700`

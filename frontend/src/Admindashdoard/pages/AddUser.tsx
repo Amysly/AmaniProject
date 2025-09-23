@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
+import { toast } from "react-toastify";
+import Spinner from "../../components/Spinner";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { register, reset } from "../../feature/auth/authslice";
 
 type AddUserProps = {
   onClose: () => void;
 };
 
-type FormData = {
+type FormInfo = {
   name: string;
   email: string;
   password: string;
@@ -13,17 +17,52 @@ type FormData = {
 };
 
 const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<FormInfo>({
     name: "",
     email: "",
     password: "",
     password2: "",
   });
 
+  const { name, email, password, password2 } = formData;
+
+  const dispatch = useAppDispatch();
+  const { user, isLoading, isSuccess, isError, message } = useAppSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess || user) {
+       // close modal after success
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        password2: "",
+      });
+    }
+
+    dispatch(reset());
+  }, [user, isError, isSuccess, message, dispatch, onClose]);
+
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("A user has been created!");
-    onClose(); // close modal after submission
+    if (password !== password2) {
+      toast.error("Passwords do not match");
+    } else {
+      const userData = {
+        name,
+        email,
+        password,
+      };
+      alert("A user has been created!");
+      onClose()
+      dispatch(register(userData));
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,6 +72,10 @@ const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
       [name]: value,
     }));
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">

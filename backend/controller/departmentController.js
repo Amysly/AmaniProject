@@ -5,7 +5,7 @@ const Department = require('../models/departmentModel');
 // @route   GET /api/departments
 // @access  Private
 const getDepartments = asyncHandler(async (req, res) => {
-  const departments = await Department.find({ user: req.user.id });
+  const departments = await Department.find();
   res.status(200).json(departments);
 });
 
