@@ -52,6 +52,32 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+const updateProfileImage = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error("No image file uploaded");
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Build full URL
+  const imagePath = `/uploads/${req.file.filename}`;
+  const fullUrl = `${req.protocol}://${req.get("host")}${imagePath}`;
+
+  user.profileImage = fullUrl;
+  await user.save();
+
+  res.status(200).json({
+    message: "Profile image updated",
+    profileImage: user.profileImage,
+  });
+});
+
+
 // Login 
 const login = asyncHandler(async (req, res) => {
     const {email, password} = req.body
@@ -81,4 +107,5 @@ module.exports = {
   registerUser,
   login,
   getMe,
+  updateProfileImage,
 };

@@ -25,6 +25,8 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
   const [openResults, setOpenResults] = useState(false);
   const [openRoles, setOpenRoles] = useState(false);
   const [openDepartments, setOpenDepartments] = useState(false);
+  const [openCourses, setOpenCourses] = useState(false);
+
 
   return (
     <div
@@ -34,11 +36,11 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
       ${showSideBar ? "translate-x-0" : "-translate-x-full"}
     `}
     >
-      <h2 className="text-2xl font-bold mt-10">Admin Dashboard</h2>
-      <nav className="mt-10">
+      <h2 className="text-2xl font-bold mt-5">Admin Dashboard</h2>
+      <nav className="mt-5">
         <ul>
           {/* Dashboard */}
-          <li className="mt-5 mb-5">
+          <li className="mt-3 mb-3">
             <NavLink
               to="/"
               className={({ isActive }: NavLinkProps) =>
@@ -48,9 +50,19 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
               <LayoutDashboard size={20} /> Dashboard
             </NavLink>
           </li>
+            <li className="mt-3 mb-3">
+            <NavLink
+              to="/profile"
+              className={({ isActive }: NavLinkProps) =>
+                `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700 text-2xl`
+              }
+            >
+              <Users size={20}  /> Profile
+            </NavLink>
+          </li>
 
           {/* Department Dropdown */}
-          <li className="mt-5 mb-5">
+          <li className="mt-3 mb-3">
             <button
               onClick={() => setOpenDepartments(!openDepartments)}
               className="flex items-center justify-between w-full text-left text-white font-serif text-2xl p-2 hover:bg-gray-700 rounded"
@@ -83,14 +95,41 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
                      All Departments
                   </NavLink>
                 </li>
-                                <li>
+              </ul>
+            )}
+          </li>
+          {/* Courses */}
+           <li className="mt-3 mb-3">
+            <button
+              onClick={() => setOpenCourses(!openCourses)}
+              className="flex items-center justify-between w-full text-left text-white font-serif text-2xl p-2 hover:bg-gray-700 rounded"
+            >
+              <span className="flex items-center gap-2">
+                <BookOpen size={20} /> Courses
+              </span>
+              {openCourses ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </button>
+
+            {openCourses && (
+              <ul className="ml-6 mt-2 space-y-1">
+                <li>
                   <NavLink
-                    to="/courses"
+                    to="/create-courses"
                     className={({ isActive }: NavLinkProps) =>
                       `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700`
                     }
                   >
-                    Create Courses
+                     Create Courses
+                  </NavLink>
+                </li>
+                  <li>
+                  <NavLink
+                    to="/all-courses"
+                    className={({ isActive }: NavLinkProps) =>
+                      `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700`
+                    }
+                  >
+                    All Courses
                   </NavLink>
                 </li>
               </ul>
@@ -98,7 +137,7 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
           </li>
 
           {/* Results Dropdown */}
-          <li className="mt-5 mb-5">
+          <li className="mt-3 mb-3">
             <button
               onClick={() => setOpenResults(!openResults)}
               className="flex items-center justify-between w-full text-left text-white font-serif text-2xl p-2 hover:bg-gray-700 rounded"
@@ -136,7 +175,7 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
           </li>
 
           {/* Users */}
-          <li className="mt-5 mb-5">
+          <li className="mt-3 mb-3">
             <NavLink
               to="/users"
               className={({ isActive }: NavLinkProps) =>
@@ -148,7 +187,7 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
           </li>
 
           {/* Roles Dropdown */}
-          <li className="mt-5 mb-5">
+          <li className="mt-3 mb-3">
             <button
               onClick={() => setOpenRoles(!openRoles)}
               className="flex items-center justify-between w-full text-left text-white font-serif text-2xl p-2 hover:bg-gray-700 rounded"
@@ -161,16 +200,6 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
 
             {openRoles && (
               <ul className="ml-6 mt-2 space-y-1">
-                <li>
-                  <NavLink
-                    to="/assign-roles"
-                    className={({ isActive }: NavLinkProps) =>
-                      `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700`
-                    }
-                  >
-                    Assign Roles
-                  </NavLink>
-                </li>
                 <li>
                   <NavLink
                     to="/permission"

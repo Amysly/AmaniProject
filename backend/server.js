@@ -3,6 +3,7 @@ const dotenv = require('dotenv').config()
 const colors = require('colors')
 const connectDB = require('./config/db')
 const {errorHandler} = require('./middleware/errorMiddleWare')
+const path = require('path');   
 
 
 const app = express();
@@ -11,6 +12,8 @@ connectDB()
 
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/users/', require('./routes/userRoutes'))
 app.use('/api/admin/courses', require('./routes/coursesRoutes'))

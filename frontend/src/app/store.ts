@@ -9,7 +9,7 @@ import departmentReducer from "../feature/departments/departmentSlice"
 export const store = configureStore({
     reducer :{
         auth: authReducer,
-        course: courseReducer,
+        courses: courseReducer,
         departments : departmentReducer,
 
     },

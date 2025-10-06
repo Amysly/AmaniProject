@@ -9,18 +9,22 @@ export interface UserData {
   name?: string;
   email: string;
   password: string;
+  role: string;
+  profileImage:string;
 }
 
 export interface UserResponse {
   _id: string;
   name: string;
   email: string;
+  role:string;
+  profileImage:string;
   token: string;
 }
 
 interface UpdateUserPayload {
   _id: string;
-  updatedData: { name?: string; email?: string };
+  updatedData: { name?: string; email?: string; role?:string; };
 }
 // Register user
 const register = async (userData: UserData): Promise<UserResponse> => {
@@ -86,6 +90,33 @@ const deleteUser = async (
   );
   return response.data;
 };
+
+
+// Upload profile image
+const uploadProfileImage = async (
+  file: File,
+  token: string
+): Promise<UserResponse> => {
+  const formData = new FormData();
+  formData.append("profileImage", file);
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  };
+
+  const response = await axios.post(`${API_URL}profile`, formData, config);
+
+  if (response.data) {
+    localStorage.setItem("user", JSON.stringify(response.data));
+  }
+
+  return response.data; 
+};
+
+
 // Login user
 const login = async (userData: UserData): Promise<UserResponse> => {
   try {
@@ -112,7 +143,8 @@ const authService = {
   logout,
   getUsers,
   updateUser,
-  deleteUser
+  deleteUser,
+  uploadProfileImage
 };
 
 export default authService;

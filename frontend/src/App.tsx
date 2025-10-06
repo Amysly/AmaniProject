@@ -36,9 +36,11 @@ import Users from './Admindashdoard/pages/Users';
 import ResultsEntry from './Admindashdoard/pages/ResultsEntry';
 import Department from './Admindashdoard/pages/Department';
 import PermissionsTable from './Admindashdoard/pages/PermissionTable';
-import RolesForm from './Admindashdoard/pages/RolesForm';
 import Settings from './Dashboard/pages/Setting';
 import ViewResults from './Admindashdoard/pages/ViewResults';
+import UserProfile from './Admindashdoard/pages/UserProfile';
+import CreateCourses from './Admindashdoard/pages/CreateCourses';
+import AllCourses from './Admindashdoard/pages/AllCourses';
 
 
 const App: React.FC = () => {
@@ -72,14 +74,15 @@ const App: React.FC = () => {
           <Route>
               <Route path="/admin-dashboard" element={<AdminDashBoard/>} />
               <Route path="/users" element={<Users />} />
+               <Route path="/profile" element={<UserProfile />} />
               <Route path="/setting" element={<Settings />} />
               <Route path="/resultentry" element={<ResultsEntry />} />
               <Route path="/viewresults" element={<ViewResults />} />
-               <Route path="/assign-roles" element={<RolesForm />} />
                <Route path="/permission" element={<PermissionsTable />} />
                <Route path="/departments" element={<Department />} />
                 <Route path="/all-departments" element={<ViewDepartments />} />
-               <Route path="/courses" element={<Courses/>} />
+               <Route path="/create-courses" element={<CreateCourses/>} />
+                <Route path="/all-courses" element={<AllCourses/>} />
             </Route>
         </Route>
       </>

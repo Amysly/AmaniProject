@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, type PayloadAction  } from "@reduxjs/toolkit";
 import courseService from "./courseService";
 
 
@@ -9,15 +9,13 @@ export interface CourseData {
   department: string; 
 }
 
-// data you receive from backend
+// data  receive from backend
 export interface CourseResponse {
-  id: string;
+  _id: string;
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
   department: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface CourseState {
@@ -26,6 +24,12 @@ interface CourseState {
   isSuccess: boolean;
   isLoading: boolean;
   message: string;
+}
+
+interface UpdateCoursePayload {
+  _id: string;
+   updatedData: {  courseTitle?: string;  courseCode?: string; 
+  courseUnit?:number ; department?: string;};
 }
 
 const initialState: CourseState = {
@@ -68,8 +72,48 @@ export const getCourses = createAsyncThunk<
   }
 });
 
+// update course
+export const updateCourse = createAsyncThunk<
+CourseResponse,
+  UpdateCoursePayload,
+  { rejectValue: string }
+>(
+  'courses/updateCourse',
+  async (payload, thunkAPI) => {
+    try {
+      const token = (thunkAPI.getState() as any).auth.user?.token;
+      return await courseService.updateCourse(payload, token);
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || error.message || error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+//delete course
+
+export const deleteCourse = createAsyncThunk<
+  { id: string; message: string }, // response type
+  string,                           // argument type (course ID)
+  { rejectValue: string }           // error type
+>(
+  "courses/deleteCourse", // fixed action name
+  async (id, thunkAPI) => {
+    try {
+      const token = (thunkAPI.getState() as any).auth.user?.token;
+      return await courseService.deleteCourse(id, token);
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || error.message || error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+
 export const courseSlice = createSlice({
-  name: "course",
+  name: "courses",
   initialState,
   reducers: {
     reset: () => initialState,
@@ -98,6 +142,34 @@ export const courseSlice = createSlice({
         state.courses = action.payload;
       })
       .addCase(getCourses.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+        //update course
+            .addCase(updateCourse.pending, (state) => {
+              state.isLoading = true;
+            })
+           .addCase(updateCourse.fulfilled, (state, action: PayloadAction<CourseResponse>) => {
+              state.isLoading = false;
+              state.isSuccess = true;
+      
+              const index = state.courses.findIndex((u) => u._id === action.payload._id);
+              if (index !== -1) {
+                state.courses[index] = action.payload; // updated course replaces old one
+              }
+            })
+
+       // deletecourse
+      .addCase(deleteCourse.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteCourse.fulfilled, (state, action: PayloadAction<{ id: string; message: string }>) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.courses = state.courses.filter(course => course._id !== action.payload.id);
+      })
+      .addCase(deleteCourse.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;

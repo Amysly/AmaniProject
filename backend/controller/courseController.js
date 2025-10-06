@@ -5,7 +5,7 @@ const Course = require('../models/courseModel');
 // @route   GET /api/courses
 // @access  Private
 const getCourses = asyncHandler(async (req, res) => {
-    const courses = await Course.find({ user: req.user.id }).populate('department', 'departmentName');;
+    const courses = await Course.find().populate('department', 'departmentName');;
     res.status(200).json(courses);
 });
 
@@ -39,17 +39,15 @@ const createCourse = asyncHandler(async (req, res) => {
 // @route   PUT /api/courses/:id
 // @access  Private
 const updateCourse = asyncHandler(async (req, res) => {
+     if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error("Access denied, Admin only");
+  }
     const course = await Course.findById(req.params.id);
 
     if (!course) {
         res.status(404);
         throw new Error("Course not found");
-    }
-
-    // Check if user owns the course
-    if (course.user.toString() !== req.user.id) {
-        res.status(403);
-        throw new Error("Not authorized");
     }
 
     const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, {
@@ -73,16 +71,10 @@ const deleteCourse = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Course not found");
     }
-
-    // Check if user owns the course
-    if (course.user.toString() !== req.user.id) {
-        res.status(403);
-        throw new Error("Not authorized");
-    }
-
+    
     await course.deleteOne();
 
-    res.status(200).json({ message: 'Course deleted', id: req.params.id });
+    res.status(200).json({id: course._id, message: 'Course deleted'});
 });
 
 module.exports = {

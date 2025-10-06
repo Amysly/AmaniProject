@@ -5,6 +5,8 @@ export interface User {
   _id: string;   // match MongoDB’s field
   name: string;
   email: string;
+  role: string;
+ profileImage: string;
   token?: string;
 }
 
@@ -12,13 +14,14 @@ interface UserResponse {
   _id: string;
   name: string;
   email: string;
+  profileImage: string;
   token: string;
 }
 
 
  interface UpdateUserPayload {
   _id: string;
-  updatedData: { name?: string; email?: string };
+  updatedData: { name?: string; email?: string ; role?:string;};
 }
 
 interface AuthState {
@@ -111,6 +114,18 @@ export const deleteUser = createAsyncThunk<
       const message =
         error.response?.data?.message || error.message || error.toString();
       return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const uploadProfileImage = createAsyncThunk(
+  "auth/uploadProfileImage",
+  async (file: File, thunkAPI) => {
+    try {
+      const token = (thunkAPI.getState() as any).auth.user.token;
+      return await authService.uploadProfileImage(file, token);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -218,7 +233,7 @@ export const authSlice = createSlice({
         state.message = action.payload as string;
       })
 
-      //  fixed deleteUser reducer
+      // deleteUser
       .addCase(deleteUser.pending, (state) => {
         state.isLoading = true;
       })
@@ -231,7 +246,22 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;
-      });
+      })
+
+      //upload image
+     .addCase(uploadProfileImage.pending, (state) => {
+      state.isLoading = true;
+    })
+      .addCase(uploadProfileImage.fulfilled, (state, action: PayloadAction<User>) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.user = action.payload; // whole user, not just profileImage
+    })
+    .addCase(uploadProfileImage.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.message = action.payload as string;
+    });
   },
 });
 
