@@ -10,9 +10,5 @@ const {protect} = require('../middleware/authMiddleWare')
   .get( protect, getAllResults)
   .post(protect, createResults);
 
-router.route('/:id')
-  .put(protect, updateCourse)
-  .delete(protect, deleteCourse);
-
 module.exports = router;
 

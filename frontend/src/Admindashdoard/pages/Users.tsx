@@ -6,6 +6,7 @@ import Spinner from "../../components/Spinner";
 import AddUser from "./AddUser";
 import UpdateUser from "./UpdateUser";
 import SearchBar from "../components/SearchBar";
+import { Link } from "react-router-dom";
 
 interface UserData {
   _id: string;
@@ -122,7 +123,9 @@ const Users: React.FC = () => {
             {displayedUsers.length > 0 ? (
               displayedUsers.map((user: UserData) => (
                 <tr key={user._id} className="text-center border-b">
-                  <td className="p-2">{user.name}</td>
+                <td className="p-2 hover:underline">
+                <Link to={`/studentdetails/${user._id}`}>{user.name}</Link>
+              </td>
                   <td className="p-2">{user.email}</td>
                   <td className="p-2">
                     <select

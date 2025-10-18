@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
+const { populate } = require('dotenv');
 
 
 
@@ -14,6 +15,47 @@ const getAllUsers = asyncHandler(async (req, res) => {
   }
     const user = await User.find()
     res.status(200).json(user);
+});
+
+
+const getUserById = asyncHandler(async (req, res) => {
+  if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error("Access denied, Admin only");
+  }
+
+  const userId = req.params.id;
+
+  const user = await User.findById(userId)
+    .populate("department", "departmentName")
+    .populate({
+      path: "results",
+      populate: [
+        { path: "courses", select: "courseTitle courseCode creditUnit" },
+        { path: "department", select: "departmentName" }
+      ],
+    });
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // response to match frontend StudentData type
+  const response = {
+    _id: user._id,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage,
+    },
+    department: user.department,
+    results: user.results || [],
+  };
+
+  res.status(200).json(response);
 });
 
 
@@ -106,6 +148,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 module.exports = { 
   getAllUsers,
+  getUserById,
   adminCreateUser,
   updateUser,
   deleteUser

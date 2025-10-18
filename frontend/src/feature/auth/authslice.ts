@@ -18,6 +18,35 @@ interface UserResponse {
   token: string;
 }
 
+ interface Course {
+  courseTitle: string;
+  courseCode: string;
+  creditUnit: number;
+}
+
+ interface Result {
+  _id: string;
+  session: string;
+  semester: string;
+  level: number;
+  score: number;
+  grade: string;
+  courses: Course;
+}
+
+ interface Department {
+  _id: string;
+  departmentName: string;
+}
+
+interface StudentData {
+  _id: string;
+ user: User;
+  department: Department;
+  results: Result[];
+}
+
+
 
  interface UpdateUserPayload {
   _id: string;
@@ -26,6 +55,7 @@ interface UserResponse {
 
 interface AuthState {
   user: User | null;
+  studentData: StudentData | null;
   users: User[];
   isError: boolean;
   isSuccess: boolean;
@@ -39,6 +69,7 @@ const user = localStorage.getItem('user')
 
 const initialState: AuthState = {
   user: user ? user : null,
+  studentData:  null,
   users: [],
   isError: false,
   isSuccess: false,
@@ -80,6 +111,26 @@ export const getUsers = createAsyncThunk<User[], void, { rejectValue: string }>(
     }
   }
 );
+
+//get user by id
+export const getUserById = createAsyncThunk<
+  StudentData, 
+  string, 
+  { rejectValue: string }
+>(
+  "auth/getUserById",
+  async (id, thunkAPI) => {
+    try {
+      const token = (thunkAPI.getState() as any).auth.user?.token;
+      return await authService.getUserById(id, token);
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || error.message || error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 //update user
 export const updateUser = createAsyncThunk<
   UserResponse,
@@ -213,6 +264,22 @@ export const authSlice = createSlice({
         state.message = action.payload as string;
         state.users = [];
       })
+      //getuser by id
+       .addCase(getUserById.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUserById.fulfilled, (state, action: PayloadAction<StudentData>) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.studentData = action.payload;
+      })
+      .addCase(getUserById.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+        state.studentData = null;
+      })
+
       //update
       .addCase(updateUser.pending, (state) => {
         state.isLoading = true;

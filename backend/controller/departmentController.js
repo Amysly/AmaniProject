@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Department = require('../models/departmentModel');
 
+
 // @desc    Get all departments for logged-in user
 // @route   GET /api/departments
 // @access  Private
@@ -20,6 +21,9 @@ const createDepartment = asyncHandler(async (req, res) => {
   const { departmentName,  totalCreditUnitPerSession, 
     minCreditUnitPerSemester, maxCreditUnitPerSemester } = req.body;
 
+    console.log("Department data received:", req.body);
+
+
   if (!departmentName || !totalCreditUnitPerSession || 
     !minCreditUnitPerSemester || !maxCreditUnitPerSemester) {
     res.status(400);
@@ -33,7 +37,6 @@ const createDepartment = asyncHandler(async (req, res) => {
     maxCreditUnitPerSemester,
     user: req.user.id,
   });
-
   res.status(201).json(department);
 });
 

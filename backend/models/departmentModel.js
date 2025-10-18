@@ -1,12 +1,7 @@
 const mongoose = require('mongoose');
 
 const departmentSchema = mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User'
-    },
-    departmentName: {
+      departmentName: {
         type: String,
         required: [true, 'Please enter a department name']
     },
@@ -22,6 +17,16 @@ const departmentSchema = mongoose.Schema({
         type: Number,
         required: [true, 'Please enter the maximum credit unit for a semester']
     },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },  
+      results:[ 
+          {
+    type: mongoose.Schema.Types.ObjectId,
+      ref: 'Result',
+    }],
 }, {
     timestamps: true
 });

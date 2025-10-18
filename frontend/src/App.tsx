@@ -33,7 +33,7 @@ import Setting from './Dashboard/pages/Setting';
 import AdminDashBoard from './Admindashdoard/components/AdminDashBoard';
 import AdminMainLayout from './Admindashdoard/Layout/AdminMainLayout';
 import Users from './Admindashdoard/pages/Users';
-import ResultsEntry from './Admindashdoard/pages/ResultsEntry';
+import ResultsEntry from './Admindashdoard/pages/ResultEntry';
 import Department from './Admindashdoard/pages/Department';
 import PermissionsTable from './Admindashdoard/pages/PermissionTable';
 import Settings from './Dashboard/pages/Setting';
@@ -41,6 +41,7 @@ import ViewResults from './Admindashdoard/pages/ViewResults';
 import UserProfile from './Admindashdoard/pages/UserProfile';
 import CreateCourses from './Admindashdoard/pages/CreateCourses';
 import AllCourses from './Admindashdoard/pages/AllCourses';
+import StudentDetail from './Admindashdoard/pages/StudentDetail';
 
 
 const App: React.FC = () => {
@@ -83,6 +84,7 @@ const App: React.FC = () => {
                 <Route path="/all-departments" element={<ViewDepartments />} />
                <Route path="/create-courses" element={<CreateCourses/>} />
                 <Route path="/all-courses" element={<AllCourses/>} />
+                 <Route path="/studentdetails/:id" element={<StudentDetail/>} />
             </Route>
         </Route>
       </>

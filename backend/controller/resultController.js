@@ -4,45 +4,47 @@ const Results = require('../models/resultsModel')
 
 //add results (admin only)
 const createResults = asyncHandler(async (req, res) => {
-    if (req.user || req.user.role ==='admin') {
-         res.status(403);
+  if (!req.user || req.user.role !== 'admin') {
+    res.status(403);
     throw new Error("Access denied, Admin only");
-        
-    }
-    const  {grade, level, session, semester, courses, score} = req.body;
+  }
 
-    if (!grade || !level || !session || !semester || score == null || !courses ) {
-        throw new Error("please fill all field");   
-        
-    }
-    
-    //Determine the grades
-    if (score === 100 || score > 70) {
-        grade = 'A';
-    } else if (score >= 60) {
-        grade = 'B';
-    } else if (score >= 50) {
-        grade = 'C';
-    } else if (score >= 40) {
-        grade = 'D';
-    } else {
-        grade = 'F';
-    }
+  let { grade, level, session, semester, courses, score, department } = req.body;
 
-    const results = await Results.create({
-        session,
-        score,
-        level,
-        courses,
-        grade,
-        user: req.user.id
-    });
-    res.status(200).json(results)
-})
+  if (score == null || !level || !session || !semester || !courses || !department ) {
+    res.status(400);
+    throw new Error("Please fill all fields");
+  }
 
+  // Compute grade
+  if (score >= 70) {
+    grade = 'A';
+  } else if (score >= 60) {
+    grade = 'B';
+  } else if (score >= 50) {
+    grade = 'C';
+  } else if (score >= 40) {
+    grade = 'D';
+  } else {
+    grade = 'F';
+  }
+
+  const result = await Results.create({
+    session,
+    score,
+    level,
+    courses,
+    grade,
+    semester,
+    department ,
+    user: req.user.id
+  });
+
+  res.status(201).json(result);
+});
 // Get results for all loggedin users
  const getMyResults = asyncHandler(async (req, res) => {
-    const results = await Results.find({ student: req.user.id })
+    const results = await Results.find({ user: req.user.id })
         .populate('course', 'courseName courseCode creditUnit')
         .sort({ session: 1, semester: 1 });
 
@@ -94,8 +96,9 @@ const getAllResults = asyncHandler(async (req, res) => {
   }
 
   const results = await Results.find()
-    .populate('user', 'name email')
-    .populate('course', 'courseName courseCode creditUnit');
+    .populate('user', 'name')
+    .populate('courses', 'courseTitle courseCode creditUnit')
+    .populate("department", "departmentName");
 
   res.status(200).json(results);
 });

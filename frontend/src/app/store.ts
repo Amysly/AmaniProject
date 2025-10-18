@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../feature/auth/authslice"
 import courseReducer from "../feature/courses/courseSlice"
 import departmentReducer from "../feature/departments/departmentSlice"
+import resultReducer from "../feature/result/resultSlice"
 
 
 
@@ -11,6 +12,7 @@ export const store = configureStore({
         auth: authReducer,
         courses: courseReducer,
         departments : departmentReducer,
+        result: resultReducer
 
     },
 })

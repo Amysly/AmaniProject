@@ -22,6 +22,34 @@ export interface UserResponse {
   token: string;
 }
 
+export interface Course {
+  courseTitle: string;
+  courseCode: string;
+  creditUnit: number;
+}
+
+export interface Result {
+  _id: string;
+  session: string;
+  semester: string;
+  level: number;
+  score: number;
+  grade: string;
+  courses: Course;
+}
+
+export interface Department {
+  _id: string;
+  departmentName: string;
+}
+
+export interface StudentData {
+  _id: string;
+  user:UserData;
+  department: Department;
+  results: Result[];
+}
+
 interface UpdateUserPayload {
   _id: string;
   updatedData: { name?: string; email?: string; role?:string; };
@@ -52,6 +80,17 @@ const getUsers = async (token: string): Promise<UserResponse[]> => {
   const response = await axios.get<UserResponse[]>(adminAPI_URL, config);
   return response.data;
 }
+
+export const getUserById = async (
+  _id: string,
+  token: string
+): Promise<StudentData> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  const response = await axios.get<StudentData>(`${adminAPI_URL}/${_id}`, config);
+  return response.data;
+};
 
 //update user
 const updateUser = async (
@@ -142,6 +181,7 @@ const authService = {
   login,
   logout,
   getUsers,
+  getUserById,
   updateUser,
   deleteUser,
   uploadProfileImage

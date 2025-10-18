@@ -20,6 +20,7 @@ app.use('/api/admin/courses', require('./routes/coursesRoutes'))
 app.use('/api/admin/departments', require('./routes/departmentRoutes'));
 app.use('/api/registercourse/', require('./routes/courseRegistrationRoutes'))
 app.use('/api/admin/users', require('./routes/adminRoute'))
+app.use('/api/results', require('./routes/resultRoutes'))
 
 app.use(errorHandler)
 
