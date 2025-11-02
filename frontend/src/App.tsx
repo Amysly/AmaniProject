@@ -42,8 +42,7 @@ import UserProfile from './Admindashdoard/pages/UserProfile';
 import CreateCourses from './Admindashdoard/pages/CreateCourses';
 import AllCourses from './Admindashdoard/pages/AllCourses';
 import StudentDetail from './Admindashdoard/pages/StudentDetail';
-
-
+import CourseRegistration from './Dashboard/pages/CourseRegistration';
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 2000 });
@@ -68,6 +67,7 @@ const App: React.FC = () => {
           <Route path="/dashboard" element={<DashBoard />} />
           <Route path="/dashboard/users" element={<Students />} />
           <Route path="/dashboard/setting" element={<Setting />} />
+          <Route path="/course-registration" element={<CourseRegistration />} />
         </Route>
 
       {/* Admin Dashboard Routes */}

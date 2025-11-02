@@ -1,46 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { register, reset } from '../feature/auth/authslice';
-import Spinner from '../components/Spinner';
+import React, { useState, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { register, reset } from "../feature/auth/authslice";
+import Spinner from "../components/Spinner";
+import { getDepartments } from "../feature/departments/departmentSlice";
 
-interface RegisterForm{
-  name: string,
-  email: string,
-  password: string,
-  password2: string
+interface RegisterFormData {
+  name: string;
+  email: string;
+  level: string;
+  matriNumber: string;
+  department: string;
+  password: string;
+  password2: string;
 }
+
 const RegisterForm: React.FC = () => {
-  const [formData, setFormData] = useState<RegisterForm>({
-    name: '',
-    email: '',
-    password: '',
-    password2: '',
+  const [formData, setFormData] = useState<RegisterFormData>({
+    name: "",
+    email: "",
+    level: "",
+    matriNumber: "",
+    department: "",
+    password: "",
+    password2: "",
   });
 
-  const { name, email, password, password2 } = formData;
+  const { name, email, password, password2, matriNumber, level, department } =
+    formData;
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-const { user, isLoading, isError, isSuccess, message } = useAppSelector(
+  const { user, isLoading, isError, isSuccess, message } = useAppSelector(
     (state) => state.auth
   );
+  const { departments } = useAppSelector((state) => state.departments);
 
   useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
+   dispatch(getDepartments())
+  }, [dispatch]);
 
-    if (isSuccess || user) {
-      navigate('/dashboard');
-    }
-
+  useEffect(() => {
+    if (isError) toast.error(message);
+    if (isSuccess && user) toast.success(message)
+      navigate("/login");
+      ;
     dispatch(reset());
   }, [user, isError, isSuccess, message, navigate, dispatch]);
 
-  const handleForm = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleForm = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData((prevData) => ({
       ...prevData,
       [e.target.name]: e.target.value,
@@ -51,21 +63,28 @@ const { user, isLoading, isError, isSuccess, message } = useAppSelector(
     e.preventDefault();
 
     if (password !== password2) {
-      toast.error('Passwords do not match');
-    } else {
-      const userData = {
-        name,
-        email,
-        password,
-      };
-
-      dispatch(register(userData));
+      toast.error("Passwords do not match");
+      return;
     }
+
+    if (!department|| !name || !email || !matriNumber || !password || !level) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    const userData = {
+      name,
+      email,
+      matriNumber: matriNumber.toUpperCase(),
+      department,
+      level,
+      password,
+    };
+
+    dispatch(register(userData));
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  if (isLoading) return <Spinner />;
 
   return (
     <div className="max-w-md mx-auto mt-40 p-4 shadow-lg rounded bg-white">
@@ -89,6 +108,45 @@ const { user, isLoading, isError, isSuccess, message } = useAppSelector(
           className="w-full px-3 py-2 border rounded"
           required
         />
+
+        <select
+          name="level"
+          value={level}
+          onChange={handleForm}
+          className="w-full px-3 py-2 border rounded"
+          required
+        >
+          <option value="">Select Level</option>
+          <option value="100 level">100 level</option>
+          <option value="200 level">200 level</option>
+          <option value="300 level">300 level</option>
+        </select>
+
+        <input
+          type="text"
+          name="matriNumber"
+          value={matriNumber}
+          onChange={handleForm}
+          placeholder="Matric Number (e.g., MAR/AR/2025)"
+          className="w-full px-3 py-2 border rounded"
+          required
+        />
+
+        <select
+          name="department"
+          value={department}
+          onChange={handleForm}
+          className="w-full px-3 py-2 border rounded"
+          required
+        >
+          <option value="">-- Select Department --</option>
+          {departments.map((dept) => (
+            <option key={dept._id} value={dept._id}>
+              {dept.departmentName}
+            </option>
+          ))}
+        </select>
+
         <input
           type="password"
           name="password"
@@ -107,7 +165,11 @@ const { user, isLoading, isError, isSuccess, message } = useAppSelector(
           className="w-full px-3 py-2 border rounded"
           required
         />
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">
+
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded"
+        >
           Register
         </button>
       </form>

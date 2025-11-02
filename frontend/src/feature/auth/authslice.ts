@@ -7,6 +7,9 @@ export interface User {
   email: string;
   role: string;
  profileImage: string;
+ level:string;
+  matriNumber:string;
+ department: string;
   token?: string;
 }
 
@@ -14,6 +17,9 @@ interface UserResponse {
   _id: string;
   name: string;
   email: string;
+  level:string;
+ department: string;
+ matriNumber:string;
   profileImage: string;
   token: string;
 }

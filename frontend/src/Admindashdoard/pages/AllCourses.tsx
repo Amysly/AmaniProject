@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Spinner from "../../components/Spinner";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { getCourses, deleteCourse, reset } from "../../feature/courses/courseSlice";
+import { getCoursesByAdmin, deleteCourse, reset } from "../../feature/courses/courseSlice";
 import UpdateCourse from "./UpdateCourse";
 import { FaEdit, FaTrash, FaExclamationCircle, FaTimes } from "react-icons/fa";
 
@@ -16,6 +16,7 @@ interface Course {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
+  courseLevel: string;
   department:  Department;
 }
 
@@ -27,7 +28,7 @@ const AllCourses: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   const dispatch = useAppDispatch();
-  const { courses, isLoading, isError, message } = useAppSelector(
+  const {  adminCourses, isLoading, isError, message } = useAppSelector(
     (state) => state.courses
   );
 
@@ -63,7 +64,7 @@ const AllCourses: React.FC = () => {
 
   // Fetch courses on mount
   useEffect(() => {
-    dispatch(getCourses());
+    dispatch(getCoursesByAdmin());
     return () => {
       dispatch(reset());
     };
@@ -89,17 +90,19 @@ const AllCourses: React.FC = () => {
             <th className="p-2">COURSE TITLE</th>
             <th className="p-2">COURSE CODE</th>
             <th className="p-2">COURSE UNIT</th>
+             <th className="p-2">COURSE LEVEL</th>
             <th className="p-2">DEPARTMENT</th>
             <th className="p-2">ACTIONS</th>
           </tr>
         </thead>
         <tbody>
-          {courses.length > 0 ? (
-            courses.map((course: Course) => (
+          {adminCourses.length > 0 ? (
+             adminCourses.map((course: Course) => (
               <tr key={course._id} className="text-center border-b">
                 <td className="p-2">{course.courseTitle}</td>
                 <td className="p-2">{course.courseCode}</td>
                 <td className="p-2">{course.courseUnit}</td>
+                 <td className="p-2">{course.courseLevel}</td>
                 <td className="p-2">{course.department?.departmentName || "No department"}</td>
                 <td className="p-2 flex justify-center gap-2">
                   <button

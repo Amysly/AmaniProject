@@ -16,9 +16,10 @@ app.use(express.urlencoded({extended:false}))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/users/', require('./routes/userRoutes'))
-app.use('/api/admin/courses', require('./routes/coursesRoutes'))
+app.use('/api/admin/courses', require('./routes/adminCourseRoute'))
+app.use("/api/student/courses", require("./routes/coursesRoutes"));
 app.use('/api/admin/departments', require('./routes/departmentRoutes'));
-app.use('/api/registercourse/', require('./routes/courseRegistrationRoutes'))
+app.use('/api/registercourse', require('./routes/courseRegistrationRoutes'))
 app.use('/api/admin/users', require('./routes/adminRoute'))
 app.use('/api/results', require('./routes/resultRoutes'))
 

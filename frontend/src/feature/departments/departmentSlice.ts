@@ -60,8 +60,7 @@ export const getDepartments = createAsyncThunk<
   { rejectValue: string }
 >("departments/getAll", async (_, thunkAPI) => {
   try {
-    const token = (thunkAPI.getState() as any).auth.user.token;
-    return await departmentservice.getDepartments(token);
+    return await departmentservice.getDepartments();
   } catch (error: any) {
     const message =
       error.response?.data?.message || error.message || error.toString();

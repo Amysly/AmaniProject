@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { updateCourse, getCourses } from "../../feature/courses/courseSlice";
+import { updateCourse, getCoursesByAdmin } from "../../feature/courses/courseSlice";
 import { toast } from "react-toastify";
 import { FaTimes } from "react-icons/fa";
 
@@ -58,7 +58,7 @@ const UpdateCourse: React.FC<UpdateCourseProps> = ({ course, onClose }) => {
       ).unwrap();
 
       toast.success("Course updated successfully!");
-      dispatch(getCourses());
+      dispatch(getCoursesByAdmin());
       onClose();
     } catch (error: any) {
       toast.error(error);

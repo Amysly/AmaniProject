@@ -1,12 +1,14 @@
 import axios from "axios";
 
 const API_URLCOURSE = "/api/admin/courses";
+const API_URLCOURSESTUDENTS = "/api/student/courses";
 
 // data you send to backend
 export interface CourseData {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
+  courseLevel: string;
   department: string; 
 }
 
@@ -16,6 +18,7 @@ export interface CourseResponse {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
+  courseLevel:string;
   department: string;
 }
 
@@ -40,8 +43,29 @@ const createCourse = async (
   return response.data;
 };
 
-// get all courses
-const getCourses = async (token: string): Promise<CourseResponse[]> => {
+// get all courses filtered by department
+const getCoursesByStudents = async (
+  token: string,
+  departmentId?: string
+): Promise<CourseResponse[]> => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const url = departmentId
+    ? `${API_URLCOURSESTUDENTS}?department=${departmentId}`
+    : API_URLCOURSESTUDENTS;
+
+  const response = await axios.get<CourseResponse[]>(url, config);
+  return response.data;
+};
+
+// get all courses by Admin
+const getCoursesByAdmin = async (
+  token: string,
+): Promise<CourseResponse[]> => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -51,6 +75,7 @@ const getCourses = async (token: string): Promise<CourseResponse[]> => {
   const response = await axios.get<CourseResponse[]>(API_URLCOURSE, config);
   return response.data;
 };
+
 
 //update course
 const updateCourse = async (
@@ -91,9 +116,10 @@ token:string
 
 const courseService = {
   createCourse,
-  getCourses,
+  getCoursesByStudents,
   updateCourse,
   deleteCourse,
+  getCoursesByAdmin
 };
 
 export default courseService;

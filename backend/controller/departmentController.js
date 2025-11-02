@@ -7,6 +7,11 @@ const Department = require('../models/departmentModel');
 // @access  Private
 const getDepartments = asyncHandler(async (req, res) => {
   const departments = await Department.find();
+  if (!departments || departments.length === 0) {
+    res.status(404);
+    throw new Error("Department not found");
+    
+  }
   res.status(200).json(departments);
 });
 

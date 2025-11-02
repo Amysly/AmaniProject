@@ -17,7 +17,7 @@ const NavBar: React.FC<HandleSideBar>= ({ handleSideBar }) => {
   return (
     <>
       <div className="relative z-50">
-        <div className="bg-gray-800 text-white p-4 flex justify-between
+        <div className="text-black p-4 flex justify-between
          items-center fixed left-0 top-0 right-0 z-[100]">
           <div className="flex items-center space-x-4">
             <div className="mt-1 cursor-pointer">

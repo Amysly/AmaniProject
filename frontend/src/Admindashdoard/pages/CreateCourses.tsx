@@ -8,6 +8,7 @@ interface CourseFormData {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
+  courseLevel:string;
   department: string;
 }
 
@@ -22,6 +23,7 @@ const CreateCourses: React.FC = () => {
     courseTitle: "",
     courseCode: "",
     courseUnit: 0,
+    courseLevel: "",
     department: "",
   });
 
@@ -37,6 +39,7 @@ const CreateCourses: React.FC = () => {
         courseTitle: "",
         courseCode: "",
         courseUnit: 0,
+        courseLevel:"",
         department: "",
       });
       dispatch(reset());
@@ -57,6 +60,7 @@ const CreateCourses: React.FC = () => {
       toast.error("Please select a department");
       return;
     }
+if (formData) console.log("Fetched created courses:", formData);
 
     dispatch(createCourse(formData));
   };
@@ -96,6 +100,16 @@ const CreateCourses: React.FC = () => {
         name="courseUnit"
         placeholder="Course Unit"
         value={formData.courseUnit}
+        onChange={handleChange}
+        className="w-full px-3 py-2 border rounded-lg"
+        required
+      />
+
+       <input
+        type="text"
+        name="courseLevel"
+        placeholder="Course Level"
+        value={formData.courseLevel}
         onChange={handleChange}
         className="w-full px-3 py-2 border rounded-lg"
         required

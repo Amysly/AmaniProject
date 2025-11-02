@@ -13,6 +13,11 @@ const courseSchema = mongoose.Schema({
         type: Number,
         required: [true, 'Please enter a course code']
     },
+      courseLevel: {
+        type: String,
+        enum:['100 level', '200 level', '300 level'],
+        required: [true, 'Please enter a course level']
+    },
     department: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

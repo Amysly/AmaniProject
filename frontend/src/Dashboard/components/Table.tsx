@@ -42,7 +42,7 @@ const Table: React.FC = () => {
   ]
   return (
 <div className="mt-10 mb-3">
-      <h2 className="text-xl font-bold mb-3">Recent Orders</h2>
+      <h2 className="text-xl font-bold mb-3">Student Data</h2>
       <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
         <thead className="bg-gray-800 text-white">
           <tr>

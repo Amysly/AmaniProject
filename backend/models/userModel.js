@@ -5,10 +5,10 @@ const userSchema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Department',
     },
-    results:[ 
+ results:[ 
       {
 type: mongoose.Schema.Types.ObjectId,
-  ref: 'Result',
+  ref: 'Results',
 }],
   name: {
     type: String,
@@ -19,6 +19,15 @@ type: mongoose.Schema.Types.ObjectId,
     required: [true, 'please add an email'],
     unique: true
   },
+level: {
+        type: String,
+        required: [true, 'Please enter a level']
+    },
+ matriNumber:{
+        type:String,
+        required:[true, 'Please enter your Matriculation Number'],
+        unique:true
+    },
   password: {
     type: String,
     required: [true, 'please add a password']

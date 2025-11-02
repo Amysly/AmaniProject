@@ -11,6 +11,9 @@ export interface UserData {
   password: string;
   role: string;
   profileImage:string;
+  level:string;
+  matriNumber:string;
+ department: string;
 }
 
 export interface UserResponse {
@@ -19,6 +22,9 @@ export interface UserResponse {
   email: string;
   role:string;
   profileImage:string;
+  level:string;
+  matriNumber:string;
+ department: string;
   token: string;
 }
 

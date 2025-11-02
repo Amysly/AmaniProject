@@ -36,7 +36,7 @@ const createResults = asyncHandler(async (req, res) => {
     courses,
     grade,
     semester,
-    department ,
+   department,
     user: req.user.id
   });
 
@@ -45,6 +45,7 @@ const createResults = asyncHandler(async (req, res) => {
 // Get results for all loggedin users
  const getMyResults = asyncHandler(async (req, res) => {
     const results = await Results.find({ user: req.user.id })
+        .populate("department", "departmentName")
         .populate('course', 'courseName courseCode creditUnit')
         .sort({ session: 1, semester: 1 });
 

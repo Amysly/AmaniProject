@@ -25,7 +25,7 @@ const departmentSchema = mongoose.Schema({
       results:[ 
           {
     type: mongoose.Schema.Types.ObjectId,
-      ref: 'Result',
+      ref: 'Results',
     }],
 }, {
     timestamps: true

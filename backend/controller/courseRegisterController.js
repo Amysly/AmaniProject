@@ -4,89 +4,114 @@ const Department = require('../models/departmentModel');
 const Course = require('../models/courseModel');
 
 const registerCourses = asyncHandler(async (req, res) => {
-    let { session, semester, level, department: departmentId, courses } = req.body;
+  let { session, semester, gender, courses } = req.body;
 
-    if (!session || !semester || !level || !departmentId || !courses || !courses.length) {
-        res.status(400);
-        throw new Error("Please fill all fields and select at least one course");
-    }
+  // Validate inputs
+  if (!session || !semester || !gender || !courses || !courses.length) {
+    res.status(400);
+    throw new Error("Please fill all fields");
+  }
 
-    // Check if already registered for this semester
-    const existingRegistration = await CourseRegistration.findOne({
-        session,
-        semester,
-        level,
-        department: departmentId,
-        user: req.user.id
-    });
+  // Get department  and matri number from logged-in user
+  const departmentId = req.user.department;
+  const matriNumber = req.user.matriNumber;
+  if (!departmentId) {
+    res.status(400);
+    throw new Error("User does not have a department assigned");
+  }
 
-    if (existingRegistration) {
-        res.status(400);
-        throw new Error("You have already registered courses for this semester and level.");
-    }
+  if(!matriNumber){
+    res.status(400)
+    throw new Error("User does not have a matric number assigned")
+  }
+  //  Prevent duplicate registration
+  const existingRegistration = await CourseRegistration.findOne({
+    session,
+    semester,
+    gender,
+    user: req.user.id,
+  });
 
-    // Fetch department
-    const department = await Department.findById(departmentId);
-    if (!department) {
-        res.status(404);
-        throw new Error("Department not found");
-    }
+  if (existingRegistration) {
+    res.status(400);
+    throw new Error("You have already registered courses for this semester.");
+  }
 
-    //if it is a string parse it.
-    if (typeof courses === 'string') {
-        courses = JSON.parse(courses)
-        
-    }
-    // Fetch selected courses
-    const selectedCourses = await Course.find({ _id: { $in: courses } });
+  //  Fetch department info from DB (since we need credit limits)
+  const department = await Department.findById(departmentId);
+  if (!department) {
+    res.status(404);
+    throw new Error("Department not found");
+  }
 
-    // Calculate total units for the semester
-    const totalUnits = selectedCourses.reduce((sum, course) => sum + course.courseUnit, 0);
+  //  Parse courses if needed
+  if (typeof courses === "string") {
+    courses = JSON.parse(courses);
+  }
 
-    // Check min/max per semester
-    if (totalUnits < department.minCreditUnitPerSemester) {
-        res.status(400);
-        throw new Error(`You must register at least ${department.minCreditUnitPerSemester} units`);
-    }
-    if (totalUnits > department.maxCreditUnitPerSemester) {
-        res.status(400);
-        throw new Error(`You cannot register more than ${department.maxCreditUnitPerSemester} units`);
-    }
+  //  Fetch the selected course documents
+  const selectedCourses = await Course.find({ _id: { $in: courses } });
 
-    // Check total per session across both semesters
-    const otherSemester = semester === 'First' ? 'Second' : 'First';
-    const otherReg = await CourseRegistration.findOne({
-        session,
-        semester: otherSemester,
-        level,
-        department: departmentId,
-        user: req.user.id
-    }).populate('courses');
+  // Calculate total units for the semester
+  const totalUnits = selectedCourses.reduce((sum, course) => sum + course.courseUnit, 0);
 
-    let totalSessionUnits = totalUnits;
-    if (otherReg) {
-        const otherUnits = otherReg.courses.reduce((sum, course) => sum + course.courseUnit, 0);
-        totalSessionUnits += otherUnits;
-    }
+  // Validate against department credit limits
+  if (totalUnits < department.minCreditUnitPerSemester) {
+    res.status(400);
+    throw new Error(`You must register at least ${department.minCreditUnitPerSemester} units`);
+  }
 
-    if (totalSessionUnits > department.totalCreditUnitPerSession) {
-        res.status(400);
-        throw new Error(`Total units for the session cannot exceed ${department.totalCreditUnitPerSession}`);
-    }
+  if (totalUnits > department.maxCreditUnitPerSemester) {
+    res.status(400);
+    throw new Error(`You cannot register more than ${department.maxCreditUnitPerSemester} units`);
+  }
 
-    // Create the registration
-    const registerCourse = await CourseRegistration.create({
-        session,
-        semester,
-        level,
-        department: departmentId,
-        courses,
-        user: req.user.id
-    });
+  // Check session total across both semesters
+  const otherSemester = semester === "First Semester" ? "Second Semester" : "First Semester";
+  const otherReg = await CourseRegistration.findOne({
+    session,
+    semester: otherSemester,
+    gender,
+    user: req.user.id,
+  }).populate("courses");
 
-    res.status(201).json(registerCourse);
+  let totalSessionUnits = totalUnits;
+  if (otherReg) {
+    const otherUnits = otherReg.courses.reduce((sum, course) => sum + course.courseUnit, 0);
+    totalSessionUnits += otherUnits;
+  }
+
+  if (totalSessionUnits > department.totalCreditUnitPerSession) {
+    res.status(400);
+    throw new Error(`Total units for the session cannot exceed ${department.totalCreditUnitPerSession}`);
+  }
+
+  // Save registration
+  const registerCourse = await CourseRegistration.create({
+    session,
+    semester,
+    gender,
+    department: departmentId, // store  for reference, but not from body
+    courses,
+    matriNumber,
+    user: req.user.id,
+  });
+
+  res.status(201).json(registerCourse);
 });
 
+// student registered courses 
+const getAllRegisteredCourses = asyncHandler(async (req, res) => {
+  const registeredCourses = await CourseRegistration.find({user: req.user.id})
+    .populate('user', 'name')
+    .populate('courses', 'courseTitle courseCode creditUnit')
+    .populate("department", "departmentName");
+
+  res.status(200).json(registeredCourses);
+});
+
+
 module.exports = {
-    registerCourses
+    registerCourses,
+    getAllRegisteredCourses
 };

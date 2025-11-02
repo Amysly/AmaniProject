@@ -12,9 +12,9 @@ const generateToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/user
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, role } = req.body; 
+  const { name, email, password, role, level, matriNumber, department } = req.body; 
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !level || !matriNumber || !department) {
     res.status(400);
     throw new Error('Please fill in all fields');
   }
@@ -35,6 +35,9 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password: hashedPassword,
+    level,
+    matriNumber,
+    department,
     role, 
   });
 
@@ -43,6 +46,9 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      level: user.level,
+      matriNumber:user.matriNumber,
+      department : user.department,
       role: user.role, // send role back in response too
       token: generateToken(user._id),
     });
@@ -80,20 +86,23 @@ const updateProfileImage = asyncHandler(async (req, res) => {
 
 // Login 
 const login = asyncHandler(async (req, res) => {
-    const {email, password} = req.body
+    const {matriNumber, password} = req.body
 
-    const user = await User.findOne({email})
+    const user = await User.findOne({ matriNumber: matriNumber.toUpperCase() })
     if (user &&(await bcrypt.compare(password, user.password))) {
         res.status(200).json({
             _id:user.id,
             name:user.name,
             email:user.email,
+            level: user.level,
+             matriNumber:user.matriNumber,
+             department : user.department,
              role: user.role,
             token:generateToken(user._id)
         })
     }else{
         res.status(400)
-        throw new Error("invalid data");
+        throw new Error("Invalid matric number or password");
         
     }
 });

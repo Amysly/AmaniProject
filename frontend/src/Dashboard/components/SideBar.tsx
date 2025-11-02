@@ -7,35 +7,59 @@ type SideBarProps ={
 
 
 const LinkClass = ({ isActive }:{ isActive: boolean }) =>
-  isActive ? "bg-blue-500 px-4 py-2 font-serif text-2xl rounded" 
-           : "text-white font-serif text-2xl";
+  isActive ? "bg-blue-500 w-full block px-4 py-2 font-serif text-1xl" 
+           : "text-black font-serif text-1xl w-full block";
 
 const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
   return (
     <div className={`
-      fixed top-0 left-0 h-screen w-64 pt-16 bg-gray-900 p-5 text-white z-50
+      fixed top-0 left-0 h-screen w-64 pt-16 bg-white p-5 text-black z-50 side-bar
       transform transition-transform duration-300 ease-in-out
       ${showSideBar ? 'translate-x-0' : '-translate-x-full'}
     `}>
-      <h2 className="text-2xl font-bold mt-10">Student</h2>
-      <nav className="mt-10">
+      <h2 className="text-2xl font-bold mt-5">Student</h2>
+      <nav className="mt-5">
         <ul>
-          <li className="mt-5 mb-5">
+          <li className="mt-5 mb-2">
             <NavLink to="/dashboard" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })}
              p-2 hover:bg-gray-700 rounded`}>
-              Profile
+              Dashboard
             </NavLink>
           </li>
-          <li className="mt-5 mb-5">
+          <li className="mt-3 mb-2">
             <NavLink to="/users" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })} 
             p-2 hover:bg-gray-700 rounded`}>
               Courses
             </NavLink>
           </li>
-          <li className="mt-5 mb-5">
-            <NavLink to="/setting" className={({ isActive }:{ isActive: boolean }) => `${LinkClass({ isActive })}
+          <li className="mt-3 mb-2">
+            <NavLink to="/course-registration" className={({ isActive }:{ isActive: boolean }) => `${LinkClass({ isActive })}
              p-2 hover:bg-gray-700 rounded`}>
-              Course Reg
+              Course Registration
+            </NavLink>
+          </li>
+          <li className="mt-3 mb-2">
+            <NavLink to="/my-result" className={({ isActive }:{ isActive: boolean }) => `${LinkClass({ isActive })}
+             p-2 hover:bg-gray-700 rounded`}>
+              Results
+            </NavLink>
+          </li>
+          <li className="mt-3 mb-2">
+            <NavLink to="/payment" className={({ isActive }:{ isActive: boolean }) => `${LinkClass({ isActive })}
+             p-2 hover:bg-gray-700 rounded`}>
+              E-Payment
+            </NavLink>
+          </li>
+          <li className="mt-3 mb-2">
+            <NavLink to="/Academic-Calender" className={({ isActive }:{ isActive: boolean }) => `${LinkClass({ isActive })}
+             p-2 hover:bg-gray-700 rounded`}>
+              Academic Calender
+            </NavLink>
+          </li>
+          <li className="mt-3">
+            <NavLink to="/announcement" className={({ isActive }:{ isActive: boolean }) => `${LinkClass({ isActive })}
+             p-2 hover:bg-gray-700 rounded`}>
+              Announcements
             </NavLink>
           </li>
         </ul>

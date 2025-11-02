@@ -39,12 +39,8 @@ const createDepartment = async (
 
 // get all departments
 const getDepartments = async (
-  token: string
 ): Promise<DepartmentResponse[]> => {
-  const config = {
-    headers: { Authorization: `Bearer ${token}` },
-  };
-  const response = await axios.get<DepartmentResponse[]>(API_URL, config);
+  const response = await axios.get<DepartmentResponse[]>(API_URL);
   return response.data;
 };
 

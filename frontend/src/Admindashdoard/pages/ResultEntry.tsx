@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { createResults } from "../../feature/result/resultSlice";
 import { getDepartments } from "../../feature/departments/departmentSlice";
-import { getCourses } from "../../feature/courses/courseSlice";
+import { getCoursesByAdmin } from "../../feature/courses/courseSlice";
 import { toast } from "react-toastify";
 import Spinner from "../../components/Spinner";
 
@@ -20,7 +20,7 @@ const ResultEntry: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isLoading } = useAppSelector((state) => state.result);
   const { departments } = useAppSelector((state) => state.departments);
-  const { courses } = useAppSelector((state) => state.courses);
+  const {  adminCourses } = useAppSelector((state) => state.courses);
 
   const [formData, setFormData] = useState<FormData>({
     session: "",
@@ -38,7 +38,7 @@ const ResultEntry: React.FC = () => {
   // Fetch departments and courses
   useEffect(() => {
     dispatch(getDepartments());
-    dispatch(getCourses());
+    dispatch(getCoursesByAdmin());
   }, [dispatch]);
 
   // Handle input change
@@ -174,7 +174,7 @@ const ResultEntry: React.FC = () => {
           required
         >
           <option value="">-- Select Course --</option>
-          {courses.map((course) => (
+          { adminCourses.map((course) => (
             <option key={course._id} value={course._id}>
               {course.courseCode} - {course.courseTitle}
               {course.courseUnit}

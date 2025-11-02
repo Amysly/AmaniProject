@@ -7,11 +7,11 @@ import { reset, login } from '../feature/auth/authslice';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    matriNumber: '',
     password: '',
   });
 
-  const { email, password } = formData;
+  const { matriNumber, password } = formData;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -50,7 +50,7 @@ useEffect(() => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const userData = { email, password };
+    const userData = { matriNumber, password };
     dispatch(login(userData));
   };
 
@@ -63,11 +63,11 @@ useEffect(() => {
       <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
-          type="email"
-          name="email"
-          value={email}
+          type="text"
+          name="matriNumber"
+          value={matriNumber}
           onChange={handleForm}
-          placeholder="Email"
+          placeholder="eg MAR/AR/2025"
           className="w-full px-3 py-2 border rounded"
           required
         />

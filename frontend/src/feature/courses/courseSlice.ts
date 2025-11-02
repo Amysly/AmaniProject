@@ -6,6 +6,7 @@ export interface CourseData {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
+  courseLevel: string;
   department: string; 
 }
 
@@ -15,11 +16,13 @@ export interface CourseResponse {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
+  courseLevel:string;
   department: string;
 }
 
 interface CourseState {
-  courses: CourseResponse[];
+  adminCourses: CourseResponse[];
+ studentsCourses: CourseResponse[];
   isError: boolean;
   isSuccess: boolean;
   isLoading: boolean;
@@ -33,7 +36,8 @@ interface UpdateCoursePayload {
 }
 
 const initialState: CourseState = {
-  courses: [],
+  adminCourses: [],
+  studentsCourses:[],
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -56,15 +60,31 @@ export const createCourse = createAsyncThunk<
   }
 });
 
-// get all courses
-export const getCourses = createAsyncThunk<
+// get courses for login users
+export const getCoursesByStudents = createAsyncThunk<
   CourseResponse[],   
-  void,             
+  string,             
   { rejectValue: string }
->("course/getAll", async (_, thunkAPI) => {
+>("course/getAllCourseByStudent", async (departmentId:string, thunkAPI) => {
   try {
     const token = (thunkAPI.getState() as any).auth.user.token;
-    return await courseService.getCourses(token);
+    return await courseService.getCoursesByStudents(token, departmentId);
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || error.message || error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+// get all courses for Admin
+export const getCoursesByAdmin = createAsyncThunk<
+  CourseResponse[],   
+  void,          
+  { rejectValue: string }
+>("course/getAllCourseByAdmin", async (_, thunkAPI) => {
+  try {
+    const token = (thunkAPI.getState() as any).auth.user.token;
+    return await courseService.getCoursesByAdmin(token);
   } catch (error: any) {
     const message =
       error.response?.data?.message || error.message || error.toString();
@@ -126,22 +146,38 @@ export const courseSlice = createSlice({
       .addCase(createCourse.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.courses.push(action.payload);
+        state.adminCourses.push(action.payload);
       })
       .addCase(createCourse.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;
       })
-      .addCase(getCourses.pending, (state) => {
+       // get courses by admin
+      .addCase(getCoursesByAdmin.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getCourses.fulfilled, (state, action) => {
+      .addCase(getCoursesByAdmin.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.courses = action.payload;
+        state.adminCourses = action.payload;
       })
-      .addCase(getCourses.rejected, (state, action) => {
+      .addCase(getCoursesByAdmin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+
+      // get courses by students
+      .addCase(getCoursesByStudents.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getCoursesByStudents.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.studentsCourses = action.payload;
+      })
+      .addCase(getCoursesByStudents.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;
@@ -154,9 +190,9 @@ export const courseSlice = createSlice({
               state.isLoading = false;
               state.isSuccess = true;
       
-              const index = state.courses.findIndex((u) => u._id === action.payload._id);
+              const index = state.adminCourses.findIndex((u) => u._id === action.payload._id);
               if (index !== -1) {
-                state.courses[index] = action.payload; // updated course replaces old one
+                state.adminCourses[index] = action.payload; // updated course replaces old one
               }
             })
 
@@ -167,7 +203,7 @@ export const courseSlice = createSlice({
       .addCase(deleteCourse.fulfilled, (state, action: PayloadAction<{ id: string; message: string }>) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.courses = state.courses.filter(course => course._id !== action.payload.id);
+        state.adminCourses = state.adminCourses.filter(course => course._id !== action.payload.id);
       })
       .addCase(deleteCourse.rejected, (state, action) => {
         state.isLoading = false;
