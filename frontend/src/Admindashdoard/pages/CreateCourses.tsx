@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { toast } from "react-toastify";
 import Spinner from "../../components/Spinner";
-import { createCourse,reset } from "../../feature/courses/courseSlice";
+import { createCourse, reset } from "../../feature/courses/courseSlice";
 import { getDepartments } from "../../feature/departments/departmentSlice";
+
 interface CourseFormData {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
-  courseLevel:string;
+  courseLevel: string;
   department: string;
+  allowedDepartments: string[];
+  isOutsideElective: boolean;
+  isElective: boolean;
 }
 
 const CreateCourses: React.FC = () => {
@@ -25,6 +29,9 @@ const CreateCourses: React.FC = () => {
     courseUnit: 0,
     courseLevel: "",
     department: "",
+    allowedDepartments: [],
+    isOutsideElective: false,
+    isElective: false,
   });
 
   useEffect(() => {
@@ -39,17 +46,36 @@ const CreateCourses: React.FC = () => {
         courseTitle: "",
         courseCode: "",
         courseUnit: 0,
-        courseLevel:"",
+        courseLevel: "",
         department: "",
+        allowedDepartments: [],
+        isOutsideElective: false,
+        isElective: false,
       });
       dispatch(reset());
     }
   }, [isError, isSuccess, message, dispatch]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.checked,
+    }));
+  };
+
+  const handleMultiSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      allowedDepartments: Array.from(e.target.selectedOptions, (option) => option.value),
     }));
   };
 
@@ -60,14 +86,17 @@ const CreateCourses: React.FC = () => {
       toast.error("Please select a department");
       return;
     }
-if (formData) console.log("Fetched created courses:", formData);
+
+    if (formData.isElective && formData.allowedDepartments.length === 0) {
+      toast.error("Please select allowed departments for this elective course");
+      return;
+    }
 
     dispatch(createCourse(formData));
   };
 
-   if (isLoading) {
-      return <Spinner />;
-    }
+  if (isLoading) return <Spinner />;
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -105,7 +134,7 @@ if (formData) console.log("Fetched created courses:", formData);
         required
       />
 
-       <input
+      <input
         type="text"
         name="courseLevel"
         placeholder="Course Level"
@@ -129,6 +158,50 @@ if (formData) console.log("Fetched created courses:", formData);
           </option>
         ))}
       </select>
+
+      {/* Elective & Outside Elective */}
+      <div className="flex items-center space-x-4">
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            name="isElective"
+            checked={formData.isElective}
+            onChange={handleCheckboxChange}
+            className="accent-green-600"
+          />
+          <span>Is Elective?</span>
+        </label>
+
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            name="isOutsideElective"
+            checked={formData.isOutsideElective}
+            onChange={handleCheckboxChange}
+            className="accent-purple-600"
+          />
+          <span>Is Outside Elective?</span>
+        </label>
+      </div>
+
+      {/* Allowed Departments for Electives */}
+      {formData.isElective && (
+        <div>
+          <label className="font-medium text-gray-700 mb-1">Allowed Departments</label>
+          <select
+            multiple
+            value={formData.allowedDepartments}
+            onChange={handleMultiSelectChange}
+            className="w-full px-3 py-2 border rounded-lg"
+          >
+            {departments.map((dept) => (
+              <option key={dept._id} value={dept._id}>
+                {dept.departmentName}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <button
         type="submit"

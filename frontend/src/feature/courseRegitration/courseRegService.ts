@@ -7,6 +7,8 @@ export interface CourseRegData {
     semester:string;
     gender: string;
     courses: string [];
+departmentElectives: string[];
+  outsideElectives: string[];
 }
 
 export interface CourseRegResponse {
@@ -15,6 +17,8 @@ export interface CourseRegResponse {
     semester:string;
     gender: string;
     courses: string []; 
+departmentElectives: string[];
+  outsideElectives: string[];
 }
 
 const registerCourse = async (
@@ -31,8 +35,19 @@ const registerCourse = async (
     return response.data
 }
 
+const getAllRegisteredCourses = async (token:string):Promise<CourseRegResponse>=>{
+    const config ={
+        headers:{
+            authorization: `Bearer ${token}`
+        },
+    };
+    const response = await axios.get<CourseRegResponse>(API_URLCOURSEREG, config)
+    return response.data
+}
+
 const courseRegService = {
-    registerCourse
+    registerCourse,
+    getAllRegisteredCourses
 }
 
 export default courseRegService

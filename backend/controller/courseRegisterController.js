@@ -4,32 +4,26 @@ const Department = require('../models/departmentModel');
 const Course = require('../models/courseModel');
 
 const registerCourses = asyncHandler(async (req, res) => {
-  let { session, semester, gender, courses } = req.body;
+  let { session, semester, gender, courses, departmentElectives, outsideElectives } = req.body;
 
-  // Validate inputs
-  if (!session || !semester || !gender || !courses || !courses.length) {
+  //  Validate input
+  if (!session || !semester || !gender || !courses?.length) {
     res.status(400);
-    throw new Error("Please fill all fields");
+    throw new Error("Please fill all required fields");
   }
 
-  // Get department  and matri number from logged-in user
+  const userId = req.user.id;
   const departmentId = req.user.department;
   const matriNumber = req.user.matriNumber;
-  if (!departmentId) {
-    res.status(400);
-    throw new Error("User does not have a department assigned");
-  }
 
-  if(!matriNumber){
-    res.status(400)
-    throw new Error("User does not have a matric number assigned")
-  }
-  //  Prevent duplicate registration
+  if (!departmentId) throw new Error("User does not have a department assigned");
+  if (!matriNumber) throw new Error("User does not have a matric number assigned");
+
+  // Prevent duplicate registration for same session & semester
   const existingRegistration = await CourseRegistration.findOne({
+    user: userId,
     session,
-    semester,
-    gender,
-    user: req.user.id,
+    semester
   });
 
   if (existingRegistration) {
@@ -37,77 +31,173 @@ const registerCourses = asyncHandler(async (req, res) => {
     throw new Error("You have already registered courses for this semester.");
   }
 
-  //  Fetch department info from DB (since we need credit limits)
+  // Fetch department info
   const department = await Department.findById(departmentId);
-  if (!department) {
-    res.status(404);
-    throw new Error("Department not found");
-  }
+  if (!department) throw new Error("Department not found");
 
-  //  Parse courses if needed
-  if (typeof courses === "string") {
-    courses = JSON.parse(courses);
-  }
+  // Parse arrays if they come as strings
+  if (typeof courses === "string") courses = JSON.parse(courses);
+  if (typeof departmentElectives === "string") departmentElectives = JSON.parse(departmentElectives);
+  if (typeof outsideElectives === "string") outsideElectives = JSON.parse(outsideElectives);
 
-  //  Fetch the selected course documents
-  const selectedCourses = await Course.find({ _id: { $in: courses } });
+  // Fetch compulsory courses (main department)
+  const mainCourses = await Course.find({
+    _id: { $in: courses },
+    department: departmentId,
+    isElective: false,
+    isOutsideElective: false
+  });
 
-  // Calculate total units for the semester
-  const totalUnits = selectedCourses.reduce((sum, course) => sum + course.courseUnit, 0);
+  // Fetch department electives (within same department)
+  const deptElectiveCourses = await Course.find({
+    _id: { $in: departmentElectives },
+    department: departmentId,
+    isElective: true,
+    isOutsideElective: false
+  });
 
-  // Validate against department credit limits
+  // Fetch outside electives (from other allowed departments)
+  const outsideElectiveCourses = await Course.find({
+    _id: { $in: outsideElectives },
+    isOutsideElective: true,
+    allowedDepartments: departmentId
+  });
+
+  //  Combine all selected courses
+  const allSelectedCourses = [
+    ...mainCourses,
+    ...deptElectiveCourses,
+    ...outsideElectiveCourses
+  ];
+
+  // Calculate total units
+  const totalUnits = allSelectedCourses.reduce((sum, course) => sum + course.courseUnit, 0);
+
+  // Validate credit limits
   if (totalUnits < department.minCreditUnitPerSemester) {
-    res.status(400);
-    throw new Error(`You must register at least ${department.minCreditUnitPerSemester} units`);
+    throw new Error(`You must register at least ${department.minCreditUnitPerSemester} units.`);
   }
 
   if (totalUnits > department.maxCreditUnitPerSemester) {
-    res.status(400);
-    throw new Error(`You cannot register more than ${department.maxCreditUnitPerSemester} units`);
+    throw new Error(`You cannot register more than ${department.maxCreditUnitPerSemester} units.`);
   }
 
-  // Check session total across both semesters
+  // Check total session limit (both semesters)
   const otherSemester = semester === "First Semester" ? "Second Semester" : "First Semester";
   const otherReg = await CourseRegistration.findOne({
     session,
     semester: otherSemester,
-    gender,
-    user: req.user.id,
-  }).populate("courses");
+    user: userId
+  }).populate("courses departmentElectives outsideElectives");
 
   let totalSessionUnits = totalUnits;
   if (otherReg) {
-    const otherUnits = otherReg.courses.reduce((sum, course) => sum + course.courseUnit, 0);
+    const otherUnits = [
+      ...otherReg.courses,
+      ...otherReg.departmentElectives,
+      ...otherReg.outsideElectives
+    ].reduce((sum, course) => sum + course.courseUnit, 0);
+
     totalSessionUnits += otherUnits;
   }
 
   if (totalSessionUnits > department.totalCreditUnitPerSession) {
-    res.status(400);
     throw new Error(`Total units for the session cannot exceed ${department.totalCreditUnitPerSession}`);
   }
 
-  // Save registration
-  const registerCourse = await CourseRegistration.create({
+  //  Save registration
+  const registration = await CourseRegistration.create({
+    user: userId,
+    matriNumber,
+    department: departmentId,
     session,
     semester,
     gender,
-    department: departmentId, // store  for reference, but not from body
-    courses,
-    matriNumber,
-    user: req.user.id,
+    courses: mainCourses.map(c => c._id),
+    departmentElectives: deptElectiveCourses.map(c => c._id),
+    outsideElectives: outsideElectiveCourses.map(c => c._id),
+    totalUnits
   });
 
-  res.status(201).json(registerCourse);
+  res.status(201).json({
+    message: "Courses registered successfully",
+    totalUnits,
+    registration
+  });
 });
 
 // student registered courses 
 const getAllRegisteredCourses = asyncHandler(async (req, res) => {
-  const registeredCourses = await CourseRegistration.find({user: req.user.id})
-    .populate('user', 'name')
-    .populate('courses', 'courseTitle courseCode creditUnit')
-    .populate("department", "departmentName");
+  //Fetch all registrations for this student
+  const registeredCourses = await CourseRegistration.find({ user: req.user.id })
+    .populate('courses', 'courseTitle courseCode courseUnit')
+    .populate('departmentElectives', 'courseTitle courseCode courseUnit')
+    .populate('outsideElectives', 'courseTitle courseCode courseUnit')
+    .select('session semester courses departmentElectives outsideElectives totalUnits');
 
-  res.status(200).json(registeredCourses);
+  // Handle case where student has no registrations
+  if (!registeredCourses.length) {
+    return res.status(200).json({ message: 'No registered courses found' });
+  }
+
+  // Prepare structured result
+  const groupedCourses = {};
+
+  registeredCourses.forEach((registration) => {
+    const { session, semester, courses, departmentElectives, outsideElectives } = registration;
+
+    if (!groupedCourses[session]) {
+      groupedCourses[session] = {
+        semesters: {},
+        totalSessionUnits: 0,
+      };
+    }
+
+    if (!groupedCourses[session].semesters[semester]) {
+      groupedCourses[session].semesters[semester] = {
+        compulsoryCourses: [],
+        departmentElectives: [],
+        outsideElectives: [],
+        totalSemesterUnits: 0,
+      };
+    }
+
+    // Format and push courses
+    const formattedCourses = courses.map((course) => ({
+      courseTitle: course.courseTitle,
+      courseCode: course.courseCode,
+      courseUnit: course.courseUnit,
+    }));
+
+    const formattedDeptElectives = departmentElectives.map((course) => ({
+      courseTitle: course.courseTitle,
+      courseCode: course.courseCode,
+      courseUnit: course.courseUnit,
+    }));
+
+    const formattedOutsideElectives = outsideElectives.map((course) => ({
+      courseTitle: course.courseTitle,
+      courseCode: course.courseCode,
+      courseUnit: course.courseUnit,
+    }));
+
+    // Calculate semester total units
+    const semesterUnits = [
+      ...formattedCourses,
+      ...formattedDeptElectives,
+      ...formattedOutsideElectives
+    ].reduce((sum, course) => sum + course.courseUnit, 0);
+
+    // Add to structured result
+    groupedCourses[session].semesters[semester].compulsoryCourses.push(...formattedCourses);
+    groupedCourses[session].semesters[semester].departmentElectives.push(...formattedDeptElectives);
+    groupedCourses[session].semesters[semester].outsideElectives.push(...formattedOutsideElectives);
+    groupedCourses[session].semesters[semester].totalSemesterUnits += semesterUnits;
+
+    groupedCourses[session].totalSessionUnits += semesterUnits;
+  });
+
+  res.status(200).json(groupedCourses);
 });
 
 

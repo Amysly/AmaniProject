@@ -5,7 +5,7 @@ const Course = require('../models/courseModel');
 // @route   GET /api/courses
 // @access  Private
 const getCoursesByStudents = asyncHandler(async (req, res) => {
-  // Get department ID from query or from logged-in user's department
+  // Get department ID from query or logged-in student
   const departmentId = req.query.department || req.user?.department;
 
   if (!departmentId) {
@@ -13,20 +13,46 @@ const getCoursesByStudents = asyncHandler(async (req, res) => {
     throw new Error("Department ID not found");
   }
 
-  // Fetch courses for that department
-  const courses = await Course.find({ department: departmentId });
+  // All courses in same department
+  const allCourses = await Course.find({ department: departmentId });
 
-  if (!courses || courses.length === 0) {
+  // Core courses (not electives, not outside electives)
+  const coreCourses = await Course.find({
+    department: departmentId,
+    isElective: false,
+    isOutsideElective: false,
+  });
+
+  // Departmental electives (same dept)
+  const deptElective = await Course.find({
+    department: departmentId,
+    isElective: true,
+  });
+
+  // Outside electives (offered by other departments)
+  const outsideElectives = await Course.find({
+    isOutsideElective: true,
+    allowedDepartments: { $in: [departmentId] },
+  }).populate("department", "departmentName");
+
+  if (!allCourses || allCourses.length === 0) {
     res.status(404);
     throw new Error("No courses found for this department");
   }
 
-  res.status(200).json(courses);
+
+  res.status(200).json({
+    allCourses,       
+    coreCourses,
+    deptElective,      
+    outsideElectives, 
+  });
 });
+
 
 const getCoursesByAdmin = asyncHandler(async (req, res) => {
     const courses = await Course.find().populate('department', 'departmentName');;
-    res.status(200).json(courses);
+    res.status(200).json( courses);
 });
 
 // @desc    Create a new course
@@ -37,9 +63,11 @@ const createCourse = asyncHandler(async (req, res) => {
     res.status(403);
     throw new Error("Access denied, Admin only");
   }
-    const { courseTitle, courseCode, courseUnit,courseLevel, department } = req.body;
+    const { courseTitle, courseCode, courseUnit,courseLevel, department, 
+       isElective = false, isOutsideElective = false,  allowedDepartments =[] } = req.body;
 
-    if (!courseTitle || !courseCode || !courseUnit || !courseLevel || !department) {
+    if (!courseTitle || !courseCode || !courseUnit ||
+       !courseLevel || !department || !allowedDepartments) {
         res.status(400);
         throw new Error("Please fill all fields");
     }
@@ -51,7 +79,10 @@ const createCourse = asyncHandler(async (req, res) => {
             courseUnit,
             courseLevel,
             department,
-            user: req.user.id,
+            isElective ,
+            isOutsideElective,
+            allowedDepartments,
+            user: req.user.id
     });
 
     if (existingCourse) {
@@ -65,6 +96,9 @@ const createCourse = asyncHandler(async (req, res) => {
         courseUnit,
         courseLevel,
         department,
+         isElective,
+        isOutsideElective,
+        allowedDepartments,
         user: req.user.id,
     });
 

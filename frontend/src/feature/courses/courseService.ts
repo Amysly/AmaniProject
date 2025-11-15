@@ -9,6 +9,9 @@ export interface CourseData {
   courseCode: string;
   courseUnit: number;
   courseLevel: string;
+  isElective: boolean;
+  isOutsideElective: boolean;
+  allowedDepartments: string;
   department: string; 
 }
 
@@ -19,6 +22,9 @@ export interface CourseResponse {
   courseCode: string;
   courseUnit: number;
   courseLevel:string;
+  isElective: boolean;
+  isOutsideElective: boolean;
+  allowedDepartments: string;
   department: string;
 }
 
@@ -47,7 +53,11 @@ const createCourse = async (
 const getCoursesByStudents = async (
   token: string,
   departmentId?: string
-): Promise<CourseResponse[]> => {
+): Promise<{
+  courses: CourseResponse[];
+  departmentElectives: CourseResponse[];
+  outsideElectives: CourseResponse[];
+}> => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -58,9 +68,20 @@ const getCoursesByStudents = async (
     ? `${API_URLCOURSESTUDENTS}?department=${departmentId}`
     : API_URLCOURSESTUDENTS;
 
-  const response = await axios.get<CourseResponse[]>(url, config);
-  return response.data;
+  const response = await axios.get<{
+    allCourses: CourseResponse[];
+    deptElective: CourseResponse[];
+    outsideElectives: CourseResponse[];
+  }>(url, config);
+
+  // map backend keys to frontend expected keys
+  return {
+    courses: response.data.allCourses || [],
+    departmentElectives: response.data.deptElective || [],
+    outsideElectives: response.data.outsideElectives || [],
+  };
 };
+
 
 // get all courses by Admin
 const getCoursesByAdmin = async (

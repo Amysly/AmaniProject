@@ -28,6 +28,7 @@ import DashBoard from './Dashboard/components/DashBoard';
 import StudentMainLayout from './Dashboard/LayoutDashboard/StudentMainLayout'
 import Students from './Dashboard/pages/Students';
 import Setting from './Dashboard/pages/Setting';
+import StudentProfile from './Dashboard/pages/StudentProfile';
 
 // Admin Dashboard Pages
 import AdminDashBoard from './Admindashdoard/components/AdminDashBoard';
@@ -43,6 +44,7 @@ import CreateCourses from './Admindashdoard/pages/CreateCourses';
 import AllCourses from './Admindashdoard/pages/AllCourses';
 import StudentDetail from './Admindashdoard/pages/StudentDetail';
 import CourseRegistration from './Dashboard/pages/CourseRegistration';
+import StudentRegisteredCourses from './Dashboard/pages/StudentRegisteredCourses';
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 2000 });
@@ -68,6 +70,8 @@ const App: React.FC = () => {
           <Route path="/dashboard/users" element={<Students />} />
           <Route path="/dashboard/setting" element={<Setting />} />
           <Route path="/course-registration" element={<CourseRegistration />} />
+          <Route path="/student-course" element={<StudentRegisteredCourses />} />
+          <Route path="/student-profile" element={<StudentProfile />} />
         </Route>
 
       {/* Admin Dashboard Routes */}

@@ -45,7 +45,7 @@ const RegisterForm: React.FC = () => {
   useEffect(() => {
     if (isError) toast.error(message);
     if (isSuccess && user) toast.success(message)
-      navigate("/login");
+  navigate("/login");
       ;
     dispatch(reset());
   }, [user, isError, isSuccess, message, navigate, dispatch]);

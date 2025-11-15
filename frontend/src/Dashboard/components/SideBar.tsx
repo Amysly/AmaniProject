@@ -26,8 +26,14 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
               Dashboard
             </NavLink>
           </li>
+           <li className="mt-5 mb-2">
+            <NavLink to="/student-profile" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })}
+             p-2 hover:bg-gray-700 rounded`}>
+              Profile
+            </NavLink>
+          </li>
           <li className="mt-3 mb-2">
-            <NavLink to="/users" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })} 
+            <NavLink to="/student-course" className={({ isActive } :{ isActive: boolean }) => `${LinkClass({ isActive })} 
             p-2 hover:bg-gray-700 rounded`}>
               Courses
             </NavLink>

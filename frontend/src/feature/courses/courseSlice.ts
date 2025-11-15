@@ -1,28 +1,40 @@
-import { createSlice, createAsyncThunk, type PayloadAction  } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import courseService from "./courseService";
 
-
+// ======================
+// Types
+// ======================
 export interface CourseData {
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
   courseLevel: string;
-  department: string; 
+  coreCourses: string
+  isElective: boolean;
+  isOutsideElective: boolean;
+  allowedDepartments: string[];
+  department: string;
 }
 
-// data  receive from backend
 export interface CourseResponse {
   _id: string;
   courseTitle: string;
   courseCode: string;
   courseUnit: number;
-  courseLevel:string;
+  courseLevel: string;
+  coreCourses:string;
+  isElective: boolean;
+  isOutsideElective: boolean;
+  allowedDepartments: string[];
   department: string;
 }
 
 interface CourseState {
   adminCourses: CourseResponse[];
- studentsCourses: CourseResponse[];
+  studentsCourses: CourseResponse[];
+  coreCourses:CourseResponse[];
+  departmentElectives: CourseResponse[];
+  outsideElectives: CourseResponse[];
   isError: boolean;
   isSuccess: boolean;
   isLoading: boolean;
@@ -31,23 +43,37 @@ interface CourseState {
 
 interface UpdateCoursePayload {
   _id: string;
-   updatedData: {  courseTitle?: string;  courseCode?: string; 
-  courseUnit?:number ; department?: string;};
+  updatedData: {
+    courseTitle?: string;
+    courseCode?: string;
+    courseUnit?: number;
+    department?: string;
+  };
 }
 
+// ======================
+// Initial State
+// ======================
 const initialState: CourseState = {
   adminCourses: [],
-  studentsCourses:[],
+  studentsCourses: [],
+  coreCourses:[],
+  departmentElectives: [],
+  outsideElectives: [],
   isError: false,
   isSuccess: false,
   isLoading: false,
   message: "",
 };
 
-// create new course
+// ======================
+// Thunks
+// ======================
+
+// Create course
 export const createCourse = createAsyncThunk<
-  CourseResponse,  
-  CourseData,   
+  CourseResponse,
+  CourseData,
   { rejectValue: string }
 >("course/create", async (courseData, thunkAPI) => {
   try {
@@ -60,12 +86,17 @@ export const createCourse = createAsyncThunk<
   }
 });
 
-// get courses for login users
+// Get courses for students
 export const getCoursesByStudents = createAsyncThunk<
-  CourseResponse[],   
-  string,             
+  {
+    allCourses: CourseResponse[];
+    coreCourses: CourseResponse[];
+    deptElective: CourseResponse[];
+    outsideElectives: CourseResponse[];
+  },
+  string,
   { rejectValue: string }
->("course/getAllCourseByStudent", async (departmentId:string, thunkAPI) => {
+>("course/getAllCourseByStudents", async (departmentId: string, thunkAPI) => {
   try {
     const token = (thunkAPI.getState() as any).auth.user.token;
     return await courseService.getCoursesByStudents(token, departmentId);
@@ -76,10 +107,10 @@ export const getCoursesByStudents = createAsyncThunk<
   }
 });
 
-// get all courses for Admin
+// Get all courses (Admin)
 export const getCoursesByAdmin = createAsyncThunk<
-  CourseResponse[],   
-  void,          
+  CourseResponse[],
+  void,
   { rejectValue: string }
 >("course/getAllCourseByAdmin", async (_, thunkAPI) => {
   try {
@@ -92,46 +123,41 @@ export const getCoursesByAdmin = createAsyncThunk<
   }
 });
 
-// update course
+// Update course
 export const updateCourse = createAsyncThunk<
-CourseResponse,
+  CourseResponse,
   UpdateCoursePayload,
   { rejectValue: string }
->(
-  'courses/updateCourse',
-  async (payload, thunkAPI) => {
-    try {
-      const token = (thunkAPI.getState() as any).auth.user?.token;
-      return await courseService.updateCourse(payload, token);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.message || error.message || error.toString();
-      return thunkAPI.rejectWithValue(message);
-    }
+>("courses/updateCourse", async (payload, thunkAPI) => {
+  try {
+    const token = (thunkAPI.getState() as any).auth.user?.token;
+    return await courseService.updateCourse(payload, token);
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || error.message || error.toString();
+    return thunkAPI.rejectWithValue(message);
   }
-);
+});
 
-//delete course
-
+// Delete course
 export const deleteCourse = createAsyncThunk<
-  { id: string; message: string }, // response type
-  string,                           // argument type (course ID)
-  { rejectValue: string }           // error type
->(
-  "courses/deleteCourse", // fixed action name
-  async (id, thunkAPI) => {
-    try {
-      const token = (thunkAPI.getState() as any).auth.user?.token;
-      return await courseService.deleteCourse(id, token);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.message || error.message || error.toString();
-      return thunkAPI.rejectWithValue(message);
-    }
+  { id: string; message: string },
+  string,
+  { rejectValue: string }
+>("courses/deleteCourse", async (id, thunkAPI) => {
+  try {
+    const token = (thunkAPI.getState() as any).auth.user?.token;
+    return await courseService.deleteCourse(id, token);
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || error.message || error.toString();
+    return thunkAPI.rejectWithValue(message);
   }
-);
+});
 
-
+// ======================
+// Slice
+// ======================
 export const courseSlice = createSlice({
   name: "courses",
   initialState,
@@ -140,6 +166,7 @@ export const courseSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Create course
       .addCase(createCourse.pending, (state) => {
         state.isLoading = true;
       })
@@ -153,7 +180,8 @@ export const courseSlice = createSlice({
         state.isError = true;
         state.message = action.payload as string;
       })
-       // get courses by admin
+
+      // Get all courses (Admin)
       .addCase(getCoursesByAdmin.pending, (state) => {
         state.isLoading = true;
       })
@@ -168,35 +196,43 @@ export const courseSlice = createSlice({
         state.message = action.payload as string;
       })
 
-      // get courses by students
+      // Get student courses
       .addCase(getCoursesByStudents.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(getCoursesByStudents.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.studentsCourses = action.payload;
+        state.studentsCourses = action.payload.allCourses || [];
+        state.coreCourses = action.payload.coreCourses || [];
+        state.departmentElectives = action.payload.deptElective || [];
+        state.outsideElectives = action.payload.outsideElectives || [];
       })
       .addCase(getCoursesByStudents.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;
       })
-        //update course
-            .addCase(updateCourse.pending, (state) => {
-              state.isLoading = true;
-            })
-           .addCase(updateCourse.fulfilled, (state, action: PayloadAction<CourseResponse>) => {
-              state.isLoading = false;
-              state.isSuccess = true;
-      
-              const index = state.adminCourses.findIndex((u) => u._id === action.payload._id);
-              if (index !== -1) {
-                state.adminCourses[index] = action.payload; // updated course replaces old one
-              }
-            })
 
-       // deletecourse
+      // Update course
+      .addCase(updateCourse.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateCourse.fulfilled, (state, action: PayloadAction<CourseResponse>) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const index = state.adminCourses.findIndex((u) => u._id === action.payload._id);
+        if (index !== -1) {
+          state.adminCourses[index] = action.payload;
+        }
+      })
+      .addCase(updateCourse.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+
+      // Delete course
       .addCase(deleteCourse.pending, (state) => {
         state.isLoading = true;
       })

@@ -11,16 +11,34 @@ const courseRegistrationSchema = new mongoose.Schema({
     required: true,
     ref: 'Department',
   },
+  // Compulsory department courses
   courses: [
     {
       type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
       required: true,
+    },
+  ],
+
+  //Department electives (offered within student's department)
+  departmentElectives: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
     },
   ],
+
+  // Outside electives (offered by other departments)
+  outsideElectives: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+    },
+  ],
+
   session: {
     type: String,
-    required: [true, 'Please enter a session'],
+    required: [true, 'Please enter a session (e.g. 2024/2025)'],
   },
   semester: {
     type: String,
@@ -31,6 +49,11 @@ const courseRegistrationSchema = new mongoose.Schema({
     type: String,
     enum: ['Male', 'Female'],
     required: [true, 'Please enter your gender'],
+  },
+
+  totalUnits: {
+    type: Number,
+    default: 0, // Optional: store total credit units directly
   },
 }, { timestamps: true });
 
