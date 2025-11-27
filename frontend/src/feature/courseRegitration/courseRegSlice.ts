@@ -1,55 +1,59 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import courseRegService from "./courseRegService";
 
-// ======================
-// Types
-// ======================
-interface CourseRegData {
-  session: string;
-  semester: string;
-  gender: string;
-  courses: string[];
-  departmentElectives: string[];
-  outsideElectives: string[];
+
+
+interface CourseItem {
+  courseTitle: string;
+  courseCode: string;
+  courseUnit: number;
 }
 
-interface CourseRegResponse {
-  _id: string;
-  session: string;
-  semester: string;
-  gender: string;
-  courses: string[];
-  departmentElectives: string[];
-  outsideElectives: string[];
+interface SemesterData {
+  compulsoryCourses: CourseItem[];
+  departmentElectives: CourseItem[];
+  outsideElectives: CourseItem[];
+  totalSemesterUnits: number;
+}
+
+interface SessionData {
+  semesters: Record<string, SemesterData>; // e.g "First Semester"
+  totalSessionUnits: number;
+}
+
+interface RegisteredCoursesResponse {
+  [session: string]: SessionData;
 }
 
 interface CourseRegState {
-  courseRegistrations: CourseRegResponse[];
+ CourseRegistration: RegisteredCoursesResponse | null;
   isError: boolean;
   isLoading: boolean;
   isSuccess: boolean;
   message: string;
 }
 
-// ======================
-// Initial State
-// ======================
+ interface updateCourseFormPayload{
+    id:string;
+    updateData : {
+      courses?:  string; departmentElectives?: string;
+       outsideElectives?: string;
+    }
+}
+
+
 const initialState: CourseRegState = {
-  courseRegistrations: [],
+  CourseRegistration: null,
   isError: false,
   isSuccess: false,
   isLoading: false,
   message: "",
 };
 
-// ======================
-// Thunks
-// ======================
-
 // Register courses
 export const registerCourse = createAsyncThunk<
-  CourseRegResponse,
-  CourseRegData,
+  any,
+  any,
   { rejectValue: string }
 >("courseregistration/create", async (courseRegData, thunkAPI) => {
   try {
@@ -62,9 +66,9 @@ export const registerCourse = createAsyncThunk<
   }
 });
 
-// Get all registered courses (for logged-in student)
+// Get all registered courses
 export const getAllRegisteredCourses = createAsyncThunk<
-  CourseRegResponse[],
+  RegisteredCoursesResponse,
   void,
   { rejectValue: string }
 >("courseregistration/getAll", async (_, thunkAPI) => {
@@ -78,9 +82,25 @@ export const getAllRegisteredCourses = createAsyncThunk<
   }
 });
 
-// ======================
-// Slice
-// ======================
+//update course registration course form
+export const updateCourseForm = createAsyncThunk<
+   RegisteredCoursesResponse,
+  updateCourseFormPayload,
+  { rejectValue: string }
+>("courseregistration/updateCourseForm", async (payload, thunkAPI) => {
+  try {
+    const token = (thunkAPI.getState() as any).auth.user?.token;
+    return await courseRegService.updateCourseForm(payload, token);
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || error.message || error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+
+
+
 export const courseRegSlice = createSlice({
   name: "coursereg",
   initialState,
@@ -89,14 +109,13 @@ export const courseRegSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Register courses
+      // Register
       .addCase(registerCourse.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(registerCourse.fulfilled, (state, action) => {
+      .addCase(registerCourse.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.courseRegistrations.push(action.payload);
       })
       .addCase(registerCourse.rejected, (state, action) => {
         state.isLoading = false;
@@ -111,13 +130,29 @@ export const courseRegSlice = createSlice({
       .addCase(getAllRegisteredCourses.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.courseRegistrations = action.payload;
+        state.CourseRegistration = action.payload; // this now matches backend
       })
       .addCase(getAllRegisteredCourses.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;
-      });
+      })
+
+      //update course registration form
+     .addCase(updateCourseForm.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(updateCourseForm.fulfilled, (state, action: PayloadAction<RegisteredCoursesResponse>) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+             state.CourseRegistration = action.payload;
+          })
+          .addCase(updateCourseForm.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload as string;
+          })
+    
   },
 });
 

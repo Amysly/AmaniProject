@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* School Info */}
         <div>
-         <img src='/images/logo.jpeg' alt="logo" className="h-20 w-20 mb-2"/>
+         <img src='/images/logo1.jpg' alt="logo" className="h-24 w-24 mb-2"/>
           <p className="lg:text-lg text-gray-300">
             Empowering minds through quality health education and leadership development.
           </p>

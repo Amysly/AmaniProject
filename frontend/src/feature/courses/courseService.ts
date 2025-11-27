@@ -54,9 +54,11 @@ const getCoursesByStudents = async (
   token: string,
   departmentId?: string
 ): Promise<{
-  courses: CourseResponse[];
-  departmentElectives: CourseResponse[];
+  allCourses: CourseResponse[];
+  coreCourses: CourseResponse[];
+  deptElective: CourseResponse[];
   outsideElectives: CourseResponse[];
+
 }> => {
   const config = {
     headers: {
@@ -69,17 +71,21 @@ const getCoursesByStudents = async (
     : API_URLCOURSESTUDENTS;
 
   const response = await axios.get<{
-    allCourses: CourseResponse[];
-    deptElective: CourseResponse[];
-    outsideElectives: CourseResponse[];
+  allCourses: CourseResponse[];
+  coreCourses: CourseResponse[];
+  deptElective: CourseResponse[];
+  outsideElectives: CourseResponse[];
+
   }>(url, config);
 
   // map backend keys to frontend expected keys
-  return {
-    courses: response.data.allCourses || [],
-    departmentElectives: response.data.deptElective || [],
-    outsideElectives: response.data.outsideElectives || [],
+   return {
+    allCourses: response.data.allCourses || [],
+    coreCourses: response.data.coreCourses || [],
+    deptElective: response.data.deptElective || [],
+    outsideElectives: response.data.outsideElectives || []
   };
+
 };
 
 

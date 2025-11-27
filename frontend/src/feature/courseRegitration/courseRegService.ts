@@ -21,6 +21,14 @@ departmentElectives: string[];
   outsideElectives: string[];
 }
 
+export interface updateCourseFormPayload{
+    id:string;
+    updateData : {
+      courses?:  string; departmentElectives?: string;
+       outsideElectives?: string;
+    }
+}
+
 const registerCourse = async (
     courseDataReg: CourseRegData,
     token: string
@@ -45,9 +53,32 @@ const getAllRegisteredCourses = async (token:string):Promise<CourseRegResponse>=
     return response.data
 }
 
+const updateCourseForm = async (
+  payload: updateCourseFormPayload,
+  token: string
+): Promise<CourseRegResponse> => {
+  const { _id, updateData } = payload;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.put<CourseRegResponse>(
+    `${API_URLCOURSEREG}/${_id}`,
+    updateData,
+    config
+  );
+
+  return response.data;
+};
+
+
 const courseRegService = {
     registerCourse,
-    getAllRegisteredCourses
+    getAllRegisteredCourses,
+    updateCourseForm
 }
 
 export default courseRegService

@@ -45,6 +45,7 @@ import AllCourses from './Admindashdoard/pages/AllCourses';
 import StudentDetail from './Admindashdoard/pages/StudentDetail';
 import CourseRegistration from './Dashboard/pages/CourseRegistration';
 import StudentRegisteredCourses from './Dashboard/pages/StudentRegisteredCourses';
+import PrintCourseForm from './Dashboard/pages/PrintCourseForm';
 const App: React.FC = () => {
   useEffect(() => {
     AOS.init({ duration: 2000 });
@@ -64,7 +65,7 @@ const App: React.FC = () => {
           <Route path="login" element={<Login />} />
         </Route>
 
-        {/* Dashboard Routes */}
+        {/*student Dashboard Routes */}
         <Route element={<StudentMainLayout />}>
           <Route path="/dashboard" element={<DashBoard />} />
           <Route path="/dashboard/users" element={<Students />} />
@@ -72,6 +73,7 @@ const App: React.FC = () => {
           <Route path="/course-registration" element={<CourseRegistration />} />
           <Route path="/student-course" element={<StudentRegisteredCourses />} />
           <Route path="/student-profile" element={<StudentProfile />} />
+          <Route path="/print-courseform" element={<PrintCourseForm />} />
         </Route>
 
       {/* Admin Dashboard Routes */}

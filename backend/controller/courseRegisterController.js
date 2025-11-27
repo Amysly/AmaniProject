@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const CourseRegistration = require('../models/courseRegistration');
 const Department = require('../models/departmentModel');
 const Course = require('../models/courseModel');
+const courseRegistration = require('../models/courseRegistration');
 
 const registerCourses = asyncHandler(async (req, res) => {
   let { session, semester, gender, courses, departmentElectives, outsideElectives } = req.body;
@@ -200,8 +201,21 @@ const getAllRegisteredCourses = asyncHandler(async (req, res) => {
   res.status(200).json(groupedCourses);
 });
 
+const updateCourseForm = asyncHandler(async (req,res) => {
+  const courseForm = await courseRegistration.findById(req.params.id)
+  if (!courseForm) {
+    res.status(404);
+    throw new Error("You have not registered your courses");
+    
+  }
+const updatedCourseFormReg = await courseRegistration.findByIdAndUpdate(req.params.id,req.body,{
+  new:true
+})
+res.status(200).json(updatedCourseFormReg)
+})
 
 module.exports = {
     registerCourses,
-    getAllRegisteredCourses
+    getAllRegisteredCourses,
+    updateCourseForm
 };

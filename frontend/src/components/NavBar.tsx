@@ -20,12 +20,14 @@ const NavBar: React.FC= () => {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [aboutDropdownOpen, setAboutDropdownOpen] = useState<boolean>(false);
   const [academicsDropdownOpen, setAcademicsDropdownOpen] = useState<boolean>(false);
+  const [portalDropdownOpen, setPortalDropdownOpen] = useState<boolean>(false);
 
   // Close mobile menu when clicking a link
   const closeMobileMenu = () => {
     setIsOpen(false);
     setAboutDropdownOpen(false);
     setAcademicsDropdownOpen(false);
+    setPortalDropdownOpen(false);
   };
 
   // Close menu when clicking outside
@@ -55,7 +57,7 @@ const NavBar: React.FC= () => {
   const getNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     `font-serif text-lg lg:text-xl px-3 py-2 rounded-md transition-colors duration-200 flex items-center ${
       isActive
-        ? "text-blue-900 font-bold border-b-2 border-blue-900"
+        ? "text-blue-900 font-bold"
         : "text-blue-700 hover:text-blue-900"
     }`;
 
@@ -71,7 +73,7 @@ const NavBar: React.FC= () => {
           className="text-blue-900 font-serif text-xl sm:text-2xl lg:text-3xl font-bold"
           onClick={closeMobileMenu}
         >
-          <img src="/images/logo.jpeg" alt="logo" className="h-16 w-16" />
+          <img src="/images/logo1.jpg" alt="logo" className="h-20 w-20" />
         </NavLink>
 
         {/* Mobile menu button */}
@@ -89,7 +91,7 @@ const NavBar: React.FC= () => {
         </button>
 
         {/* Desktop Navigation links */}
-        <div className="hidden lg:flex lg:flex-row items-center lg:space-x-6">
+      <div className="hidden lg:flex lg:flex-row items-center lg:space-x-4 ml-auto">
           <NavLink to="/" className={getNavLinkClass} end>
            HOME
           </NavLink>
@@ -99,16 +101,16 @@ const NavBar: React.FC= () => {
             <button
               onMouseEnter={() => setAboutDropdownOpen(true)}
               onMouseLeave={() => setAboutDropdownOpen(false)}
-              className={`${getNavLinkClass({ isActive: false })} ${aboutDropdownOpen ? "text-blue-900 font-bold" : ""}`}
+              className={`${getNavLinkClass({ isActive: false })} ${aboutDropdownOpen ? "font-bold" : ""}`}
             >
               ABOUT
               <FaChevronDown
                 size={14}
-                className={`ml-1 transition-transform ${aboutDropdownOpen ? "rotate-180" : ""}`}
+                className='ml-1 transition-transform'
               />
             </button>
             <div
-              className={`absolute w-48 bg-blue-800 shadow-lg z-50 rounded-md overflow-hidden transition-all duration-300 ease-in-out ${
+              className={`absolute w-48 bg-blue-600 shadow-lg z-50 overflow-hidden transition-all duration-300 ease-in-out ${
                 aboutDropdownOpen
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 -translate-y-2 pointer-events-none"
@@ -136,16 +138,16 @@ const NavBar: React.FC= () => {
             <button
               onMouseEnter={() => setAcademicsDropdownOpen(true)}
               onMouseLeave={() => setAcademicsDropdownOpen(false)}
-              className={`${getNavLinkClass({ isActive: false })} ${academicsDropdownOpen ? "text-blue-900 font-bold" : ""}`}
+              className={`${getNavLinkClass({ isActive: false })} ${academicsDropdownOpen ? "font-bold" : ""}`}
             >
               ACADEMICS
               <FaChevronDown
                 size={14}
-                className={`ml-1 transition-transform ${academicsDropdownOpen ? "rotate-180" : ""}`}
+                className='ml-1 transition-transform'
               />
             </button>
             <div
-              className={`absolute w-48 bg-blue-800 shadow-lg z-50 rounded-md overflow-hidden transition-all duration-300 ease-in-out ${
+              className={`absolute w-48 bg-blue-600 shadow-lg z-50  overflow-hidden transition-all duration-300 ease-in-out ${
                 academicsDropdownOpen
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 -translate-y-2 pointer-events-none"
@@ -171,6 +173,42 @@ const NavBar: React.FC= () => {
           <NavLink to="/contact" className={getNavLinkClass}>
             CONTACT
           </NavLink>
+            {/* portal Dropdown */}
+            <div className="relative">
+            <button
+              onMouseEnter={() =>  setPortalDropdownOpen(true)}
+              onMouseLeave={() =>  setPortalDropdownOpen(false)}
+              className={`${getNavLinkClass({ isActive: false })} ${portalDropdownOpen ? "font-bold" : ""}`}
+            >
+              PORTAL
+              <FaChevronDown
+                size={14}
+                className='ml-1 transition-transform'
+              />
+            </button>
+            <div
+              className={`absolute w-48 bg-blue-600 shadow-lg z-50  overflow-hidden transition-all duration-300 ease-in-out ${
+                  portalDropdownOpen
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 -translate-y-2 pointer-events-none"
+              }`}
+              onMouseEnter={() =>  setPortalDropdownOpen(true)}
+              onMouseLeave={() =>  setPortalDropdownOpen(false)}
+            >
+              <NavLink
+                to="/login"
+                className="block px-4 py-2 text-white border-b hover:bg-blue-700 transition-colors duration-200"
+              >
+                STUDENTS
+              </NavLink>
+              <NavLink
+                to="/login"
+                className="block px-4 py-2 text-white hover:bg-blue-700 transition-colors duration-200"
+              >
+                STAFF
+              </NavLink>
+            </div>
+          </div>
           {user ? (
             <button className='bg-blue-800' onClick={onLogout}>LOGOUT</button>
           ) : (
@@ -178,8 +216,8 @@ const NavBar: React.FC= () => {
             LOGIN
           </NavLink>
           )}
-           <NavLink to="/register" className={getNavLinkClass}>
-            REGISTER
+           <NavLink to="/register" className='bg-blue-600 text-white p-2 text-lg rounded-sm'>
+            Apply Here
           </NavLink>
           
         </div>

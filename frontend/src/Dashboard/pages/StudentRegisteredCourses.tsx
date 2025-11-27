@@ -3,9 +3,11 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { getAllRegisteredCourses } from "../../feature/courseRegitration/courseRegSlice";
 import Spinner from "../../components/Spinner";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const StudentRegisteredCourses = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
   const { CourseRegistration, isLoading, message, isError } = useAppSelector(
     (state) => state.coursereg
   );
@@ -38,21 +40,24 @@ const StudentRegisteredCourses = () => {
         Your Registered Courses
       </h2>
 
-      {Object.entries(CourseRegistration).map(([session, sessionData]: any) => (
+      {Object.entries(CourseRegistration).map(([session, sessionData]) => (
         <div key={session} className="mb-10">
           <h3 className="text-xl font-semibold text-blue-700 mb-3">
             Session: {session}
           </h3>
 
           {Object.entries(sessionData.semesters).map(
-            ([semester, semData]: any) => (
+            ([semester, semData]) => (
               <div key={semester} className="mb-6">
                 <h4 className="text-lg font-medium text-gray-700 mb-2">
                   {semester}
                 </h4>
 
-                {/* === Regular Courses === */}
+                {/* === COMPULSORY COURSES === */}
                 <div className="overflow-x-auto mb-6">
+                  <h5 className="text-md font-semibold text-blue-700 mb-2">
+                    Compulsory Courses
+                  </h5>
                   <table className="w-full border-collapse border border-gray-300">
                     <thead className="bg-blue-800 text-white font-semibold text-xl">
                       <tr>
@@ -62,7 +67,7 @@ const StudentRegisteredCourses = () => {
                       </tr>
                     </thead>
                     <tbody className="text-lg font-semibold">
-                      {semData.courses.map((course: any, index: number) => (
+                      {semData.compulsoryCourses.map((course, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="border p-3">{course.courseTitle}</td>
                           <td className="border p-3">{course.courseCode}</td>
@@ -75,11 +80,11 @@ const StudentRegisteredCourses = () => {
                   </table>
                 </div>
 
-                {/* === Elective Courses === */}
-                {semData.elective && semData.elective.length > 0 && (
+                {/* === DEPARTMENT ELECTIVES === */}
+                {semData.departmentElectives.length > 0 && (
                   <div className="overflow-x-auto mb-4">
-                    <h5 className="text-md font-semibold text-blue-700 mb-2">
-                      Elective Courses
+                    <h5 className="text-md font-semibold text-green-700 mb-2">
+                      Department Electives
                     </h5>
                     <table className="w-full border-collapse border border-gray-300">
                       <thead className="bg-green-700 text-white font-semibold text-xl">
@@ -90,12 +95,41 @@ const StudentRegisteredCourses = () => {
                         </tr>
                       </thead>
                       <tbody className="text-lg font-semibold">
-                        {semData.elective.map((elective: any, index: number) => (
+                        {semData.departmentElectives.map((course, index) => (
                           <tr key={index} className="hover:bg-gray-50">
-                            <td className="border p-3">{elective.courseTitle}</td>
-                            <td className="border p-3">{elective.courseCode}</td>
+                            <td className="border p-3">{course.courseTitle}</td>
+                            <td className="border p-3">{course.courseCode}</td>
                             <td className="border p-3 text-center">
-                              {elective.courseUnit}
+                              {course.courseUnit}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* === OUTSIDE ELECTIVES === */}
+                {semData.outsideElectives.length > 0 && (
+                  <div className="overflow-x-auto mb-4">
+                    <h5 className="text-md font-semibold text-purple-700 mb-2">
+                      Outside Electives
+                    </h5>
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead className="bg-purple-700 text-white font-semibold text-xl">
+                        <tr>
+                          <th className="border p-3 text-left">Course Title</th>
+                          <th className="border p-3 text-left">Course Code</th>
+                          <th className="border p-3 text-left">Course Unit</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-lg font-semibold">
+                        {semData.outsideElectives.map((course, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="border p-3">{course.courseTitle}</td>
+                            <td className="border p-3">{course.courseCode}</td>
+                            <td className="border p-3 text-center">
+                              {course.courseUnit}
                             </td>
                           </tr>
                         ))}
@@ -116,6 +150,9 @@ const StudentRegisteredCourses = () => {
           </p>
         </div>
       ))}
+      
+        <button onClick={()=> navigate ("/print-courseform")} className="bg-blue-600 rounded-md p-2 
+        text-white text-xl">next</button>
     </div>
   );
 };

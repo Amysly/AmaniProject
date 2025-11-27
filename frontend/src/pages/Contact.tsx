@@ -14,13 +14,13 @@ const Contact: React.FC = () => {
         <div className="overlay-contact"></div>
         <div className="text-center relative z-10 pt-32 pb-16">
           <h2
-            className="text-3xl sm:text-4xl font-bold text-white mb-3 mt-20"
+            className="text-3xl sm:text-5xl font-bold text-white mb-3 mt-20"
             data-aos="fade-down"
           >
             Get In Touch With Us
           </h2>
           <p
-            className="text-lg text-white max-w-2xl mx-auto"
+            className="text-2xl text-white max-w-2xl mx-auto"
             data-aos="fade-down"
           >
             Have questions or feedback? We're here to help. Reach out to us
@@ -34,14 +34,14 @@ const Contact: React.FC = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Contact Information Card */}
             <div className="bg-white p-8 rounded-lg shadow-md lg:col-span-1 h-full">
-              <h3 className="text-xl font-bold text-red-600 mb-6 text-center">
+              <h3 className="text-xl font-bold text-blue-600 mb-6 text-center">
                 Contact Information
               </h3>
 
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="bg-red-200 p-3 rounded-full mr-4">
-                    <FaMapMarkerAlt className="text-red-600 text-xl" />
+                  <div className="bg-blue-200 p-3 rounded-full mr-4">
+                    <FaMapMarkerAlt className="text-blue-600 text-xl" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">
@@ -54,8 +54,8 @@ const Contact: React.FC = () => {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-red-200 p-3 rounded-full mr-4">
-                    <FaPhoneAlt className="text-red-600 text-xl" />
+                  <div className="bg-blue-200 p-3 rounded-full mr-4">
+                    <FaPhoneAlt className="text-blue-600 text-xl" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">
@@ -67,8 +67,8 @@ const Contact: React.FC = () => {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-red-200 p-3 rounded-full mr-4">
-                    <FaEnvelope className="text-red-600 text-xl" />
+                  <div className="bg-blue-200 p-3 rounded-full mr-4">
+                    <FaEnvelope className="text-blue-600 text-xl" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">
@@ -84,8 +84,8 @@ const Contact: React.FC = () => {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-red-200 p-3 rounded-full mr-4">
-                    <FaClock className="text-red-600 text-xl" />
+                  <div className="bg-blue-200 p-3 rounded-full mr-4">
+                    <FaClock className="text-blue-600 text-xl" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">
@@ -104,7 +104,7 @@ const Contact: React.FC = () => {
             <div className="lg:col-span-2 space-y-8">
               {/* Contact Form */}
               <div className="bg-white p-8 rounded-lg shadow-md h-full">
-                <h3 className="text-xl font-bold text-red-600 mb-6 text-center">
+                <h3 className="text-xl font-bold text-blue-600 mb-6 text-center">
                   Send Us a Message
                 </h3>
                 <form className="space-y-6">
@@ -159,7 +159,7 @@ const Contact: React.FC = () => {
 
                   <button
                     type="submit"
-                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center space-x-2 w-full sm:w-auto"
+                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center space-x-2 w-full sm:w-auto"
                   >
                     <FaPaperPlane />
                     <span>Send Message</span>
@@ -171,7 +171,7 @@ const Contact: React.FC = () => {
 
           {/* Map */}
           <div className="bg-white p-4 rounded-lg shadow-md mt-12">
-            <h3 className="text-xl font-bold text-red-600 mb-4 text-center">
+            <h3 className="text-xl font-bold text-blue-600 mb-4 text-center">
               Find Us on Map
             </h3>
             <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg overflow-hidden">

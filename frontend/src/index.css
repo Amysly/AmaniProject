@@ -24,7 +24,7 @@
 }
 
 .overlay {
-  background-color: rgba(10, 10, 223, 0.7);
+  background-color: rgba(87, 87, 131, 0.7);
   position: absolute;
   inset: 0;
   z-index: 1;

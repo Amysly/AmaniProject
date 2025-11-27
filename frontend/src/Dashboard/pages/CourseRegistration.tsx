@@ -17,10 +17,19 @@ interface CourseRegForm {
 const CourseRegistration: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const { studentsCourses, departmentElectives, outsideElectives} = useAppSelector(
-    (state) => state.courses
-  );
-  const { isError, isLoading, isSuccess, message } = useAppSelector((state) => state.coursereg);
+
+  const {
+    studentsCourses,
+    departmentElectives,
+    outsideElectives,
+  } = useAppSelector((state) => state.courses);
+
+  const {
+    isError,
+    isLoading,
+    isSuccess,
+    message,
+  } = useAppSelector((state) => state.coursereg);
 
   const [courseReg, setCourseReg] = useState<CourseRegForm>({
     session: "",
@@ -31,7 +40,7 @@ const CourseRegistration: React.FC = () => {
     gender: "",
   });
 
-  // Form input changes
+  // Handle input
   const handleChangeRegForm = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -41,7 +50,7 @@ const CourseRegistration: React.FC = () => {
     }));
   };
 
-  // Checkbox handlers
+  // Core courses handler
   const handleCourseCheckboxChange = (courseId: string) => {
     setCourseReg((prev) => {
       const isSelected = prev.courses.includes(courseId);
@@ -54,6 +63,7 @@ const CourseRegistration: React.FC = () => {
     });
   };
 
+  // Department electives handler
   const handleElectiveCheckboxChange = (electiveId: string) => {
     setCourseReg((prev) => {
       const isSelected = prev.departmentElectives.includes(electiveId);
@@ -66,6 +76,7 @@ const CourseRegistration: React.FC = () => {
     });
   };
 
+  // Outside electives handler
   const handleOutsideElectiveCheckboxChange = (electiveId: string) => {
     setCourseReg((prev) => {
       const isSelected = prev.outsideElectives.includes(electiveId);
@@ -81,6 +92,7 @@ const CourseRegistration: React.FC = () => {
   // Submit form
   const handleSubmitRegForm = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (
       !courseReg.courses.length ||
       !courseReg.session ||
@@ -90,10 +102,11 @@ const CourseRegistration: React.FC = () => {
       toast.error("Please fill in all fields");
       return;
     }
+
     dispatch(registerCourse(courseReg));
   };
 
-  // Fetch courses for student
+  // Fetch courses
   useEffect(() => {
     if (user && user.department) {
       dispatch(getCoursesByStudents(user.department));
@@ -103,7 +116,7 @@ const CourseRegistration: React.FC = () => {
   // Toast notifications
   useEffect(() => {
     if (isError) toast.error(message);
-    else if (isSuccess) {
+    if (isSuccess) {
       toast.success("Course registered successfully");
       setCourseReg({
         session: "",
@@ -117,19 +130,6 @@ const CourseRegistration: React.FC = () => {
     }
   }, [isError, isSuccess, message, dispatch]);
 
-  useEffect(()=>{
-    console.log('fetch courses', studentsCourses)
-  },[ studentsCourses])
-
-  useEffect(()=>{
-    console.log('fetch deptelectives', departmentElectives)
-  },[departmentElectives])
-
-  useEffect(()=>{
-    console.log('fetch outsideElectives',  outsideElectives)
-  },[ outsideElectives])
-
-
   if (isLoading) return <Spinner />;
 
   return (
@@ -138,13 +138,17 @@ const CourseRegistration: React.FC = () => {
         onSubmit={handleSubmitRegForm}
         className="bg-white w-full max-w-5xl p-8 rounded-lg shadow-lg"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Course Registration</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Course Registration
+        </h2>
 
-        {/* Two-column grid */}
+        {/* TWO COLUMN GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-          {/* LEFT COLUMN: Session, Semester, Gender */}
+          {/* LEFT COLUMN */}
           <div className="space-y-6">
+
+            {/* SESSION */}
             <div>
               <label className="font-medium text-gray-700">Session</label>
               <input
@@ -158,6 +162,7 @@ const CourseRegistration: React.FC = () => {
               />
             </div>
 
+            {/* SEMESTER */}
             <div>
               <label className="font-medium text-gray-700">Semester</label>
               <input
@@ -171,6 +176,7 @@ const CourseRegistration: React.FC = () => {
               />
             </div>
 
+            {/* GENDER */}
             <div>
               <label className="font-medium text-gray-700">Gender</label>
               <div className="flex items-center space-x-4 mt-2">
@@ -203,21 +209,29 @@ const CourseRegistration: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Courses */}
+          {/* RIGHT COLUMN */}
           <div className="space-y-6">
+
             {/* CORE COURSES */}
             <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Core Courses</h3>
+              <h3 className="font-semibold text-lg text-gray-800 mb-2">
+                Core Courses
+              </h3>
+
               <div className="max-h-40 overflow-y-auto border rounded-lg p-3 bg-gray-50">
                 {studentsCourses.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center">No core courses available</p>
+                  <p className="text-gray-500 text-sm text-center">
+                    No core courses available
+                  </p>
                 ) : (
-                    studentsCourses.map((course) => (
+                  studentsCourses.map((course) => (
                     <label key={course._id} className="flex items-center py-1">
                       <input
                         type="checkbox"
                         checked={courseReg.courses.includes(course._id)}
-                        onChange={() => handleCourseCheckboxChange(course._id)}
+                        onChange={() =>
+                          handleCourseCheckboxChange(course._id)
+                        }
                         className="accent-green-600"
                       />
                       <span className="ml-2 text-gray-700">
@@ -230,51 +244,60 @@ const CourseRegistration: React.FC = () => {
             </div>
 
             {/* DEPARTMENT ELECTIVES */}
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Department Electives</h3>
-              <div className="max-h-40 overflow-y-auto border rounded-lg p-3 bg-gray-50">
-                {departmentElectives.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center">No electives available</p>
-                ) : (
-                  departmentElectives.map((elective) => (
-                    <label key={elective._id} className="flex items-center py-1">
-                      <input
-                        type="checkbox"
-                        checked={courseReg.departmentElectives.includes(elective._id)}
-                        onChange={() => handleElectiveCheckboxChange(elective._id)}
-                        className="accent-blue-600"
-                      />
-                      <span className="ml-2 text-gray-700">
-                        {elective.courseTitle} ({elective.courseCode})
-                      </span>
-                    </label>
-                  ))
-                )}
-              </div>
-            </div>
+  <div>
+  {departmentElectives.length > 0 && (
+    <div>
+      <h3 className="font-semibold text-lg text-gray-800 mb-2">
+        Department Electives
+      </h3>
+
+      <div className="max-h-40 overflow-y-auto border rounded-lg p-3 bg-gray-50">
+        {departmentElectives.map((elective) => (
+          <label key={elective._id} className="flex items-center py-1">
+            <input
+              type="checkbox"
+              checked={courseReg.departmentElectives.includes(elective._id)}
+              onChange={() =>
+                handleElectiveCheckboxChange(elective._id)
+              }
+              className="accent-blue-600"
+            />
+            <span className="ml-2 text-gray-700">
+              {elective.courseTitle} ({elective.courseCode})
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
 
             {/* OUTSIDE ELECTIVES */}
             <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Outside Electives</h3>
-              <div className="max-h-40 overflow-y-auto border rounded-lg p-3 bg-gray-50">
-                {outsideElectives.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center">No outside electives available</p>
-                ) : (
-                  outsideElectives.map((elective) => (
+              {outsideElectives.length > 0 && (
+                <div className="max-h-40 overflow-y-auto border rounded-lg p-3 bg-gray-50">
+                  <h3 className="font-semibold text-lg text-gray-800 mb-2">
+                    Outside Electives
+                  </h3>
+
+                  {outsideElectives.map((elective) => (
                     <label key={elective._id} className="flex items-center py-1">
                       <input
                         type="checkbox"
                         checked={courseReg.outsideElectives.includes(elective._id)}
-                        onChange={() => handleOutsideElectiveCheckboxChange(elective._id)}
+                        onChange={() =>
+                          handleOutsideElectiveCheckboxChange(elective._id)
+                        }
                         className="accent-purple-600"
                       />
                       <span className="ml-2 text-gray-700">
                         {elective.courseTitle} ({elective.courseCode})
                       </span>
                     </label>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

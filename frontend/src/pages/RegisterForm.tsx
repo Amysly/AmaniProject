@@ -45,7 +45,7 @@ const RegisterForm: React.FC = () => {
   useEffect(() => {
     if (isError) toast.error(message);
     if (isSuccess && user) toast.success(message)
-  navigate("/login");
+  //navigate("/login");
       ;
     dispatch(reset());
   }, [user, isError, isSuccess, message, navigate, dispatch]);
@@ -120,6 +120,7 @@ const RegisterForm: React.FC = () => {
           <option value="100 level">100 level</option>
           <option value="200 level">200 level</option>
           <option value="300 level">300 level</option>
+          <option value="400 level">400 level</option>
         </select>
 
         <input

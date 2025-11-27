@@ -44,7 +44,7 @@ const Gallary: React.FC = () => {
     <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className=" text-2xl lg:text-4xl font-bold text-blue-900 mb-4">Our Gallery</h1>
+          <h1 className=" text-2xl lg:text-4xl font-bold text-blue-600 mb-4">Our Gallery</h1>
           <div className="w-20 h-1 bg-blue-600 mx-auto"></div>
         </div>
         

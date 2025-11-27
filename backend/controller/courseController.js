@@ -12,13 +12,20 @@ const getCoursesByStudents = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Department ID not found");
   }
+  //filtered courses based on the level
+  const studentLevel = req.user.level;
+
 
   // All courses in same department
-  const allCourses = await Course.find({ department: departmentId });
+  const allCourses = await Course.find({ 
+    department:  departmentId,
+    courseLevel:studentLevel,
+  });
 
   // Core courses (not electives, not outside electives)
   const coreCourses = await Course.find({
     department: departmentId,
+    courseLevel:studentLevel,
     isElective: false,
     isOutsideElective: false,
   });
@@ -26,12 +33,17 @@ const getCoursesByStudents = asyncHandler(async (req, res) => {
   // Departmental electives (same dept)
   const deptElective = await Course.find({
     department: departmentId,
-    isElective: true,
+    courseLevel:studentLevel,
+      isElective: true,
+  isOutsideElective: false
+
   });
+
 
   // Outside electives (offered by other departments)
   const outsideElectives = await Course.find({
     isOutsideElective: true,
+    courseLevel:studentLevel,
     allowedDepartments: { $in: [departmentId] },
   }).populate("department", "departmentName");
 

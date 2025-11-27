@@ -48,13 +48,15 @@ const courses: Course[] = [
 
 const Courses: React.FC = () => {
   return (
+    <>
+    <div className='bg-blue-600 text-white py-5 mt-14'>
+      <h2 className="text-2xl lg:text-5xl font-bold text-center mb-4 mt-8">Our Courses</h2>
+              <p className="text-center text-gray-600 mb-12 lg:text-2xl text-white">
+                Explore accredited health-related programs designed to build skills for the future.
+              </p>
+        </div>
     <section className="py-16 px-6 bg-gray-50 text-gray-800">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-2xl lg:text-4xl font-bold text-center text-blue-800 mb-4 mt-8">Our Courses</h2>
-        <p className="text-center text-gray-600 mb-12 lg:text-xl">
-          Explore accredited health-related programs designed to build skills for the future.
-        </p>
-
+      <div className="max-w-7xl mx-auto">
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-10">
           {courses.map((course, index) => (
             <div
@@ -66,11 +68,13 @@ const Courses: React.FC = () => {
               <img src={course.image} alt={course.title} className="w-full h-48 object-cover mb-4 rounded" />
               <h3 className="lg:text-xl font-semibold text-blue-700 mb-2">{course.title}</h3>
               <p className="text-gray-600">{course.description}</p>
+              <button className='bg-blue-600 mt-3 p-2 text-white rounded-md shadow-md'>Learn More</button>
             </div>
           ))}
         </div>
       </div>
     </section>
+    </>
   );
 };
 

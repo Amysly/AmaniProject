@@ -1,5 +1,6 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { Link } from "react-router-dom";
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
@@ -12,8 +13,8 @@ type Slide = {
 
 const slides: Slide[] = [
   {
-    image: '/images/vcstudent.jpeg',
-    title: 'Welcome to Amani College',
+    image: '/images/imagebg.jpg',
+    title: 'Welcome to HillStone College',
     text: 'Building leaders for the future.',
   },
   {
@@ -22,7 +23,7 @@ const slides: Slide[] = [
     text: 'Empowering students through innovation and integrity.',
   },
   {
-    image: '/images/exams.jpeg',
+    image: '/images/image1.jpg',
     title: 'Shape Your Future Here',
     text: 'Discover your path. Achieve your dreams.',
   },
@@ -51,13 +52,18 @@ const HeroSection: React.FC = () => {
                 backgroundSize: 'cover',
               }}
             >
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center text-center text-white px-4">
+              <div className="absolute inset-0  flex flex-col items-center justify-center text-center text-white px-4">
                 <h1 className="text-3xl lg:text-4xl font-bold mb-4" data-aos="fade-down">
                   {slide.title}
                 </h1>
                 <p className="text-xl lg:text-lg max-w-2xl" data-aos="fade-right">
                   {slide.text}
                 </p>
+               <Link to="/register">
+              <button className="bg-blue-600 py-2 px-4 mt-10 text-2xl rounded-full">
+                Register Here
+              </button>
+            </Link>
               </div>
             </div>
           </SwiperSlide>

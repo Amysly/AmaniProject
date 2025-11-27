@@ -109,8 +109,17 @@ const login = asyncHandler(async (req, res) => {
 
 // Get logged-in user (placeholder)
 const getMe = asyncHandler(async (req, res) => {
-  res.status(200).json(req.user)
+  const user = await User.findById(req.user.id)
+    .populate("department", "departmentName");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user);
 });
+
 
 module.exports = {
   registerUser,
