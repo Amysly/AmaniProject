@@ -5,13 +5,15 @@ const {
     adminCreateUser,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    adminAssignCoursesToLecturers
 } = require('../controller/adminController')
 
 const {protect} = require('../middleware/authMiddleWare')
 
  router.get( '/', protect, getAllUsers)
-    router.post( '/create-user',protect, adminCreateUser);
+ router.post('/assign-courses', protect, adminAssignCoursesToLecturers)
+router.post( '/create-user',protect, adminCreateUser);
 
 router.route('/:id')
  .get(protect, getUserById)

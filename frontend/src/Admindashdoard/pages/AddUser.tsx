@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import Spinner from "../../components/Spinner";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { register, reset } from "../../feature/auth/authslice";
+import { getDepartments } from "../../feature/departments/departmentSlice";
 
 type AddUserProps = {
   onClose: () => void;
@@ -12,80 +13,111 @@ type AddUserProps = {
 type FormInfo = {
   name: string;
   email: string;
+  level: string;
+  matriNumber: string;
+  staffId: string;
+  department: string;
   password: string;
   password2: string;
+  role: string;
 };
 
 const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
   const [formData, setFormData] = useState<FormInfo>({
     name: "",
     email: "",
+    level: "",
+    matriNumber: "",
+    staffId: "",
+    department: "",
     password: "",
     password2: "",
+    role: "",
   });
 
-  const { name, email, password, password2 } = formData;
+  const { name, email, password, password2, level, department, matriNumber, staffId, role } =
+    formData;
 
   const dispatch = useAppDispatch();
+
   const { user, isLoading, isSuccess, isError, message } = useAppSelector(
     (state) => state.auth
   );
+  const { departments } = useAppSelector((state) => state.departments);
 
+  // Fetch departments
   useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
+    dispatch(getDepartments());
+  }, [dispatch]);
 
-    if (isSuccess || user) {
-       // close modal after success
+  // Handle success and error
+  useEffect(() => {
+    if (isError) toast.error(message);
+
+    if (isSuccess) {
+      toast.success("User created successfully");
+      onClose(); // Close modal
       setFormData({
         name: "",
         email: "",
+        level: "",
+        matriNumber: "",
+        staffId: "",
+        department: "",
         password: "",
         password2: "",
+        role: "",
       });
     }
 
     dispatch(reset());
-  }, [user, isError, isSuccess, message, dispatch, onClose]);
+  }, [isError, isSuccess, message, dispatch, onClose]);
 
+  // Handle submit
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== password2) {
-      toast.error("Passwords do not match");
-    } else {
-      const userData = {
-        name,
-        email,
-        password,
-      };
-      alert("A user has been created!");
-      onClose()
-      dispatch(register(userData));
-    }
+
+    if (password !== password2)
+      return toast.error("Passwords do not match");
+
+    if (!role)
+      return toast.error("Please select a role");
+
+    const userData = {
+      name,
+      email,
+      password,
+      role,
+      department,
+      level: role === "student" ? level : "",
+      matriNumber: role === "student" ? matriNumber.toUpperCase() : "",
+      staffId: role === "lecturer" || role === "admin" ? staffId.toUpperCase() : "",
+    };
+
+    dispatch(register(userData));
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle input change
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  if (isLoading) return <Spinner />;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Overlay */}
       <div
         className="absolute inset-0 bg-black bg-opacity-50"
         onClick={onClose}
       ></div>
 
-      {/* Modal Content */}
       <div className="relative z-50 bg-white p-6 rounded shadow-md w-[90%] max-w-md">
         <button
           onClick={onClose}
@@ -93,52 +125,126 @@ const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
         >
           <FaTimes size={20} />
         </button>
-        <h1 className="mb-8 text-center font-sans text-3xl">Add User</h1>
 
-        <form
-          onSubmit={handleAddUser}
-          className="flex flex-col gap-4 justify-center"
-        >
+        <h1 className="mb-8 text-center text-3xl font-semibold">Add User</h1>
+
+        <form onSubmit={handleAddUser} className="flex flex-col gap-4">
+
           <input
-            className="border border-zinc-400 rounded-lg w-full placeholder:text-sm placeholder:font-sans p-3"
             type="text"
             name="name"
-            placeholder="Name"
-            value={formData.name}
+            placeholder="Full Name"
+            value={name}
             onChange={handleChange}
+            className="border rounded p-3"
             required
           />
+
           <input
-            className="border border-zinc-400 rounded-lg w-full placeholder:text-sm placeholder:font-sans p-3"
             type="email"
             name="email"
             placeholder="Email"
-            value={formData.email}
+            value={email}
             onChange={handleChange}
+            className="border rounded p-3"
             required
           />
+
+          {/* Role select — FIXED */}
+          <select
+            name="role"
+            value={role}
+            onChange={handleChange}
+            className="border rounded p-3"
+            required
+          >
+            <option value="">-- Select Role --</option>
+            <option value="student">Student</option>
+            <option value="lecturer">Lecturer</option>
+            <option value="admin">Admin</option>
+          </select>
+
+          {/* Student fields only */}
+          {role === "student" && (
+            <>
+              <select
+                name="level"
+                value={level}
+                onChange={handleChange}
+                className="border rounded p-3"
+                required
+              >
+                <option value="">Select Level</option>
+                <option value="100 level">100 level</option>
+                <option value="200 level">200 level</option>
+                <option value="300 level">300 level</option>
+                <option value="400 level">400 level</option>
+              </select>
+
+              <input
+                type="text"
+                name="matriNumber"
+                placeholder="Matric Number"
+                value={matriNumber}
+                onChange={handleChange}
+                className="border rounded p-3"
+                required
+              />
+               {/* Department */}
+          <select
+            name="department"
+            value={department}
+            onChange={handleChange}
+            className="border rounded p-3"
+            required
+          >
+            <option value="">-- Select Department --</option>
+            {departments?.map((dept) => (
+              <option key={dept._id} value={dept._id}>
+                {dept.departmentName}
+              </option>
+            ))}
+          </select>
+            </>
+          )}
+
+          {/* Lecturer/Admin only */}
+          {(role === "lecturer" || role === "admin") && (
+            <input
+              type="text"
+              name="staffId"
+              placeholder="Staff ID"
+              value={staffId}
+              onChange={handleChange}
+              className="border rounded p-3"
+              required
+            />
+          )}
+
+          {/* Passwords */}
           <input
-            className="border border-zinc-400 rounded-lg w-full placeholder:text-sm placeholder:font-sans p-3"
             type="password"
             name="password"
             placeholder="Password"
-            value={formData.password}
+            value={password}
             onChange={handleChange}
+            className="border rounded p-3"
             required
           />
+
           <input
-            className="border border-zinc-400 rounded-lg w-full placeholder:text-sm placeholder:font-sans p-3"
             type="password"
             name="password2"
             placeholder="Confirm Password"
-            value={formData.password2}
+            value={password2}
             onChange={handleChange}
+            className="border rounded p-3"
             required
           />
 
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-sans mt-2 transition duration-300"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded mt-2"
           >
             Add User
           </button>

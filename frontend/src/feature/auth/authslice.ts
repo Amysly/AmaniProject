@@ -9,6 +9,7 @@ export interface User {
  profileImage: string;
  level:string;
   matriNumber:string;
+   staffId:string;
  department: string;
   token?: string;
 }
@@ -20,6 +21,7 @@ interface UserResponse {
   level:string;
  department: string;
  matriNumber:string;
+ staffId:string;
   profileImage: string;
   token: string;
 }

@@ -21,7 +21,6 @@ const NavBar: React.FC <HandleSideBar>= ({ handleSideBar }) => {
             <div className="mt-1 cursor-pointer">
               <FaBars onClick={handleSideBar} size={24} />
             </div>
-            <h2 className="lg:text-xl sm:text-lg">Hi Admin</h2>
           </div>
           <div className=" flex items-center space-x-4 text-lg pr-2">
               <FaBell size={24}/>

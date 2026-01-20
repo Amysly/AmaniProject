@@ -21,12 +21,17 @@ type: mongoose.Schema.Types.ObjectId,
   },
 level: {
         type: String,
-        required: [true, 'Please enter a level']
+       // required: [true, 'Please enter a level']
     },
  matriNumber:{
         type:String,
-        required:[true, 'Please enter your Matriculation Number'],
+       // required:[true, 'Please enter your Matriculation Number'],
         unique:true
+    },
+     staffId: {
+      type: String,
+      unique: true,
+      //required: true,
     },
   password: {
     type: String,

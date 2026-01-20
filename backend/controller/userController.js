@@ -12,12 +12,35 @@ const generateToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/user
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, role, level, matriNumber, department } = req.body; 
+  const { name, email, password, role, level, matriNumber, department, staffId } =
+    req.body;
 
-  if (!name || !email || !password || !level || !matriNumber || !department) {
+  // COMMON FIELDS FOR ALL USERS
+  if (!name || !email || !password || !role) {
     res.status(400);
-    throw new Error('Please fill in all fields');
+    throw new Error("Name, email, password and role are required");
   }
+
+  // ROLE-BASED VALIDATION
+  if (role === "student") {
+    if (!level || !matriNumber || !department) {
+      res.status(400);
+      throw new Error("Students must have level, matric number and department");
+    }
+  }
+
+  if (role === "lecturer") {
+    if (!staffId) {
+      res.status(400);
+      throw new Error("Lecturers must have staff ID");
+    }
+  }
+
+  if (role === "admin") {
+    // Admin only needs name, email, password, role
+    // (department, level, etc. are NOT required)
+  }
+  
 
   // check if user exists
   const userExists = await User.findOne({ email });
@@ -37,6 +60,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
     level,
     matriNumber,
+    staffId,
     department,
     role, 
   });
@@ -48,6 +72,7 @@ const registerUser = asyncHandler(async (req, res) => {
       email: user.email,
       level: user.level,
       matriNumber:user.matriNumber,
+      staffId: user.staffId,
       department : user.department,
       role: user.role, // send role back in response too
       token: generateToken(user._id),
@@ -86,25 +111,37 @@ const updateProfileImage = asyncHandler(async (req, res) => {
 
 // Login 
 const login = asyncHandler(async (req, res) => {
-    const {matriNumber, password} = req.body
+  const { matriNumber, staffId, password } = req.body;
 
-    const user = await User.findOne({ matriNumber: matriNumber.toUpperCase() })
-    if (user &&(await bcrypt.compare(password, user.password))) {
-        res.status(200).json({
-            _id:user.id,
-            name:user.name,
-            email:user.email,
-            level: user.level,
-             matriNumber:user.matriNumber,
-             department : user.department,
-             role: user.role,
-            token:generateToken(user._id)
-        })
-    }else{
-        res.status(400)
-        throw new Error("Invalid matric number or password");
-        
-    }
+  if (!password || (!matriNumber && !staffId)) {
+    res.status(400);
+    throw new Error("Provide password and either matric number or staff ID");
+  }
+
+  let user;
+
+  if (staffId) {
+    user = await User.findOne({staffId:  staffId.toUpperCase() });
+  } else if (matriNumber) {
+    user = await User.findOne({ matriNumber: matriNumber.toUpperCase() });
+  }
+
+  if (user && (await bcrypt.compare(password, user.password))) {
+    res.status(200).json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      level: user.level,
+      matriNumber: user.matriNumber,
+      staffId: user.staffId,
+      department: user.department,
+      role: user.role,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid credentials");
+  }
 });
 
 // Get logged-in user (placeholder)

@@ -17,7 +17,6 @@ export interface ResultResponse {
   semester: string;
   level: string;
   score: number;
-  grade: string;
   course: Course;
   user?: {
     name: string;
@@ -35,6 +34,32 @@ export interface ResultData {
   course: string; // sending courseId instead of full course object
 }
 
+//assignment record
+export interface AssignmentRecordData{
+  name:string;
+  session: string;
+  semester: string;
+  level: string;
+  course: string;
+  firstTest: number;
+  secondTest: number;
+  assignmentScores:number;
+  department:string;
+}
+
+export interface AssignmentRecordRespone{
+  user?:{
+    name:string;
+  }
+  session: string;
+  semester: string;
+  level: string;
+  course: string;
+  firstTest: number;
+  secondTest: number;
+  assignmentScores:number;
+  department:string;
+}
 // For `getMyResults` response
 interface SemesterResult {
   semester: string;
@@ -64,6 +89,19 @@ const createResults = async (
   return response.data;
 };
 
+//assignmentrecord
+const creatAssignmentRecord = async (AssignmentRecordData:AssignmentRecordData,
+  token: string):Promise<AssignmentRecordRespone> => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+}
+const response = await axios.post<AssignmentRecordRespone>(`${API_URL}`, AssignmentRecordData, config);
+  return response.data;
+};
+
+
 // Fetch all results (admin)
 const getAllResults = async (token: string): Promise<ResultResponse[]> => {
   const config = {
@@ -92,6 +130,7 @@ const resultService = {
   createResults,
   getAllResults,
   getMyResults,
+  creatAssignmentRecord
 };
 
 export default resultService;

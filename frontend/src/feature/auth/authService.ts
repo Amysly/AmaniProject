@@ -13,6 +13,7 @@ export interface UserData {
   profileImage:string;
   level:string;
   matriNumber:string;
+   staffId:string;
  department: string;
 }
 
@@ -24,6 +25,7 @@ export interface UserResponse {
   profileImage:string;
   level:string;
   matriNumber:string;
+  staffId:string;
  department: string;
   token: string;
 }

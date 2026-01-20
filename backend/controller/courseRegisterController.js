@@ -8,6 +8,11 @@ const registerCourses = asyncHandler(async (req, res) => {
   let { session, semester, gender, courses, departmentElectives, outsideElectives } = req.body;
 
   //  Validate input
+  if(req.user.role !=='student'){
+      res.status(403)
+      throw new Error("Only students can register courses");
+      
+  }
   if (!session || !semester || !gender || !courses?.length) {
     res.status(400);
     throw new Error("Please fill all required fields");

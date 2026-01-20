@@ -4,6 +4,7 @@ import courseReducer from "../feature/courses/courseSlice"
 import departmentReducer from "../feature/departments/departmentSlice"
 import resultReducer from "../feature/result/resultSlice"
 import courseregReducer from "../feature/courseRegitration/courseRegSlice"
+import assignmentReducer from "../feature/assignment/assignmentSlice"
 
 
 
@@ -14,7 +15,8 @@ export const store = configureStore({
         courses: courseReducer,
         departments : departmentReducer,
         result: resultReducer,
-        coursereg: courseregReducer
+        coursereg: courseregReducer,
+        assignment:assignmentReducer
     },
 })
 // RootState = type of the entire store

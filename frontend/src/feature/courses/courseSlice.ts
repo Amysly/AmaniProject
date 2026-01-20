@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import courseService from "./courseService";
 
-// ======================
-// Types
-// ======================
 export interface CourseData {
   courseTitle: string;
   courseCode: string;
@@ -51,9 +48,7 @@ interface UpdateCoursePayload {
   };
 }
 
-// ======================
-// Initial State
-// ======================
+
 const initialState: CourseState = {
   adminCourses: [],
   studentsCourses: [],

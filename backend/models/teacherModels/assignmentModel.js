@@ -16,13 +16,7 @@ const assignmentSchema = mongoose.Schema(
         type: String,
         required: [true, 'Please enter a level']
     },
-    department: 
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Department',
-          required: true,
-     },
-
+    
      courses:
          {
            type: mongoose.Schema.Types.ObjectId,

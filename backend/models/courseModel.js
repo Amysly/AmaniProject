@@ -19,7 +19,12 @@ const courseSchema = mongoose.Schema(
       enum: ['100 level', '200 level', '300 level', '400 level'],
       required: [true, 'Please select a course level'],
     },
-
+    courseMaterials: [
+      {
+        type: String,
+      },
+    ]
+    ,
     department: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Department',

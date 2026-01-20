@@ -36,13 +36,13 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
       ${showSideBar ? "translate-x-0" : "-translate-x-full"}
     `}
     >
-      <h2 className="text-2xl font-bold mt-5">Admin Dashboard</h2>
+      <h2 className="text-2xl font-bold mt-5">Lecturer's Dashboard</h2>
       <nav className="mt-5">
         <ul>
           {/* Dashboard */}
           <li className="mt-3 mb-3">
             <NavLink
-              to="/"
+              to="/lecturer-dashboard"
               className={({ isActive }: NavLinkProps) =>
                 `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700 text-2xl`
               }
@@ -68,7 +68,7 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
               className="flex items-center justify-between w-full text-left text-white font-serif text-2xl p-2 hover:bg-gray-700 rounded"
             >
               <span className="flex items-center gap-2">
-                <BookOpen size={20} /> Departments
+                <BookOpen size={20} /> Assignment
               </span>
               {openDepartments ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </button>
@@ -77,22 +77,22 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar }) => {
               <ul className="ml-6 mt-2 space-y-1">
                 <li>
                   <NavLink
-                    to="/departments"
+                    to="/assignments"
                     className={({ isActive }: NavLinkProps) =>
                       `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700`
                     }
                   >
-                    Create Departments
+                    Create Assignments
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to="/all-departments"
+                    to="/all-assignments"
                     className={({ isActive }: NavLinkProps) =>
                       `${LinkClass({ isActive })} flex items-center gap-2 p-2 hover:bg-gray-700`
                     }
                   >
-                     All Departments
+                     All assignments
                   </NavLink>
                 </li>
               </ul>

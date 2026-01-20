@@ -8,10 +8,11 @@ import { reset, login } from '../feature/auth/authslice';
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
     matriNumber: '',
+    staffId: '',
     password: '',
   });
 
-  const { matriNumber, password } = formData;
+  const { matriNumber, password, staffId } = formData;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -33,12 +34,16 @@ useEffect(() => {
 
     if (user.role === "admin") {
       navigate("/admin-dashboard");
+    } else if (user.role === "lecturer") {
+      navigate("/lecturer-dashboard");
     } else {
       navigate("/dashboard");
     }
+
     dispatch(reset());
   }
 }, [isSuccess, user, navigate, dispatch]);
+
 
 
   const handleForm = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +55,7 @@ useEffect(() => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const userData = { matriNumber, password };
+    const userData = { matriNumber, staffId, password };
     dispatch(login(userData));
   };
 
@@ -64,8 +69,8 @@ useEffect(() => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          name="matriNumber"
-          value={matriNumber}
+          name="staffId"
+          value={staffId}
           onChange={handleForm}
           placeholder="eg MAR/AR/2025"
           className="w-full px-3 py-2 border rounded"

@@ -2,13 +2,17 @@ const express = require('express');
 const router = express.Router()
 const {createResults,
     getMyResults,
-    getAllResults} = require('../controller/resultController')
+    getAllResults,createAssignmentRecord,
+    getAllResultsByLecturer} = require('../controller/resultController')
 
 const {protect} = require('../middleware/authMiddleWare')
 
  router.route('/')
   .get( protect, getAllResults)
-  .post(protect, createResults);
+  .get(protect, getAllResultsByLecturer)
+  .post(protect, createResults)
+  .post(protect, createAssignmentRecord);
+
 
 module.exports = router;
 

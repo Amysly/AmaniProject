@@ -30,6 +30,11 @@ import Students from './Dashboard/pages/Students';
 import Setting from './Dashboard/pages/Setting';
 import StudentProfile from './Dashboard/pages/StudentProfile';
 
+//lecture Dashboard pages
+import CreateAss from './Teacherdashdoard/pages/CreateAss';
+import LecturerDashboard from './Teacherdashdoard/LecturerDashboard';
+import LecturerLayout from './Teacherdashdoard/Layout/LecturerLayout';
+
 // Admin Dashboard Pages
 import AdminDashBoard from './Admindashdoard/components/AdminDashBoard';
 import AdminMainLayout from './Admindashdoard/Layout/AdminMainLayout';
@@ -75,6 +80,12 @@ const App: React.FC = () => {
           <Route path="/student-profile" element={<StudentProfile />} />
           <Route path="/print-courseform" element={<PrintCourseForm />} />
         </Route>
+
+        {/* Lecturer's Dashboard Routes */}
+         <Route element={<LecturerLayout />}>
+          <Route path="/lecturer-dashboard" element={<LecturerDashboard />} />
+           <Route path="/assignments" element={<CreateAss />} />
+         </Route>
 
       {/* Admin Dashboard Routes */}
         <Route element={<AdminMainLayout />}>
