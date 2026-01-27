@@ -16,8 +16,17 @@ const assignmentSchema = mongoose.Schema(
         type: String,
         required: [true, 'Please enter a level']
     },
+     session: {
+    type: String,
+    required: [true, 'Please enter a session (e.g. 2024/2025)'],
+  },
+  semester: {
+    type: String,
+    enum: ['First Semester', 'Second Semester'],
+    required: [true, 'Please enter a semester'],
+  },
     
-     courses:
+     course:
          {
            type: mongoose.Schema.Types.ObjectId,
            required: true,

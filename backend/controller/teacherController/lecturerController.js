@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Course = require('../../models/courseModel');
 const LecturerCourseAssignment = require('../../models/teacherModels/lecturerCourseAssignment')
 const  courseRegistration = require('../../models/courseRegistration')
+
  
 // GET STUDENTS ASSIGNED TO LECTURER'S COURSES
 const getStudentAssignedToCourses = asyncHandler(async (req, res) => {
@@ -10,37 +11,47 @@ const getStudentAssignedToCourses = asyncHandler(async (req, res) => {
     throw new Error("Not allowed");
   }
 
-  //  Get courses assigned to the lecturer
-  const lecturerCourses = await LecturerCourseAssignment.find({
+  //  Get lecturer assignments
+  const lecturerAssignments = await LecturerCourseAssignment.find({
     lecturer: req.user._id
   });
 
-  if (!lecturerCourses.length) {
+  if (!lecturerAssignments.length) {
     return res.status(200).json({
       totalStudents: 0,
       students: []
     });
   }
 
-  //  Extract course IDs
-  const courseIds = lecturerCourses.flatMap(a => a.courses);
+  //  Collect course IDs
+  const courseIds = lecturerAssignments.flatMap(a => a.courses);
 
-  //  Get students registered for those courses
-  const studentsTakingCourse = await courseRegistration.find({
-    courses: { $in: courseIds }
+  //  Use session & semester from assignments
+  const sessions = lecturerAssignments.map(a => a.session);
+  const semesters = lecturerAssignments.map(a => a.semester);
+
+  //  Find students registered for those courses
+  const registrations = await courseRegistration.find({
+    session: { $in: sessions },
+    semester: { $in: semesters },
+    $or: [
+      { courses: { $in: courseIds } },
+      { departmentElectives: { $in: courseIds } },
+      { outsideElectives: { $in: courseIds } }
+    ]
   }).populate("user", "-password");
 
-  //  Extract users (students)
- const students = studentsTakingCourse
-  .map(r => r.user)
-  .filter(user => user.role === "student");
-
+  //  Extract students safely
+  const students = registrations
+    .map(r => r.user)
+    .filter(u => u?.role === "student");
 
   res.status(200).json({
     totalStudents: students.length,
     students
   });
 });
+
 
 
 const uploadCourseMaterial = asyncHandler(async (req, res) => {
@@ -74,5 +85,5 @@ const uploadCourseMaterial = asyncHandler(async (req, res) => {
 
 module.exports = {                                                                                                                                                                                                                                                                                 
   getStudentAssignedToCourses,
-  uploadCourseMaterial
+  uploadCourseMaterial,
 };

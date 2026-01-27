@@ -16,11 +16,13 @@ app.use(express.urlencoded({extended:false}))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/users/', require('./routes/userRoutes'))
+app.use('/api/admission/', require('./routes/admissionRoute/admissionRoute'))
 app.use('/api/lecturer/student-assignment', require('./routes/teacherRoute/assignmentRoute'))
 app.use('/api/lecturer/student-courses', require('./routes/teacherRoute/lecturerRoute'))
 app.use('/api/admin/courses', require('./routes/adminCourseRoute'))
 app.use("/api/student/courses", require("./routes/coursesRoutes"));
 app.use('/api/admin/departments', require('./routes/departmentRoutes'));
+app.use('/api/admin/all-admission', require('./routes/admissionRoute/admissionRoute'));
 app.use('/api/registercourse', require('./routes/courseRegistrationRoutes'))
 app.use('/api/admin', require('./routes/adminRoute'))
 app.use('/api/results', require('./routes/resultRoutes'))

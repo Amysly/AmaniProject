@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router()
 const {
-    createAssignment,
+createStudentAssignment,
     getAssignments,
     updateAssignment,
     deleteAssignment
@@ -10,7 +10,7 @@ const {
 const {protect} = require('../../middleware/authMiddleWare')
 router.route('/')
 .get(protect,  getAssignments)
-.post(protect, createAssignment)
+.post(protect, createStudentAssignment)
 
 router.route('/:id')
   .put(protect,  updateAssignment)

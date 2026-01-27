@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Assignment = require('../../models/teacherModels/assignmentModel');
 const Course = require('../../models/courseModel');
+const LecturerCourseAssignment = require('../../models/teacherModels/lecturerCourseAssignment')
 
 //GET ALL ASSIGNMENTS
 const getAssignments = asyncHandler(async (req,res) => {
@@ -10,15 +11,15 @@ const getAssignments = asyncHandler(async (req,res) => {
     throw new Error("Not Allowed");
   }
 const {coursesId} = req.params
-   // Check that lecturer is assigned to the course
-  const course = await Course.findOne({
-    _id: coursesId,
-    assignedLecturer: req.user.id,
+//Check if lecturer is assigned to this course
+  const lecturerAssignment = await LecturerCourseAssignment.findOne({
+    lecturer: req.user._id,
+    courses: course
   });
 
-  if (!course) {
+  if (!lecturerAssignment) {
     res.status(403);
-    throw new Error("You are not assigned to this course.");
+    throw new Error("You are not assigned to this course");
   }
   const assignments = await Assignment.find({coursesId})
 
@@ -31,54 +32,55 @@ const {coursesId} = req.params
 
 })
 
-// CREATE ASSIGNMENT
-const createAssignment = asyncHandler(async (req, res) => {
-
-  // Only lecturers can create assignments
-  if (req.user.role !== 'lecturer') {
+//Lecturer Create assignment for students
+const createStudentAssignment = asyncHandler(async (req, res) => {
+  if (!req.user || req.user.role !== "lecturer") {
     res.status(403);
-    throw new Error("Not Allowed");
+    throw new Error("Not allowed");
   }
 
-  const {
-    assignmentQuestion,
-    submissionDeadline,
-    level,
-    coursesId
-  } = req.body;
+  const { assignmentQuestion, submissionDeadline, level, 
+    course,session,semester } = req.body;
 
-  // Validate required fields
-  if (
-    !assignmentQuestion ||
-    !submissionDeadline ||
-    !level ||
-    !coursesId
-  ) {
+  // Validate input
+  if (!assignmentQuestion || !submissionDeadline || !level
+     || !course ||!semester || !session ) {
     res.status(400);
-    throw new Error("Please fill in all required fields.");
+    throw new Error("Please fill all required fields");
   }
 
-  // Check that lecturer is assigned to the course
-  const course = await Course.findOne({
-    _id: coursesId,
-    assignedLecturer: req.user.id,
+  //Check if lecturer is assigned to this course
+  const lecturerAssignment = await LecturerCourseAssignment.findOne({
+    lecturer: req.user._id,
+    courses: course,
+    session,
+    semester,
   });
 
-  if (!course) {
+  if (!lecturerAssignment) {
     res.status(403);
-    throw new Error("You are not assigned to this course.");
+    throw new Error("You are not assigned to this course");
   }
 
+  // Create assignment
   const assignment = await Assignment.create({
     assignmentQuestion,
-    submissionDeadline: new Date(submissionDeadline),
+   submissionDeadline: new Date(submissionDeadline),
     level,
-    coursesId,
-    createdBy: req.user.id,
+    course,
+    lecturer: req.user._id,
+    session,
+    semester,
+    department: lecturerAssignment.department,
   });
 
-  res.status(201).json(assignment);
+  res.status(201).json({
+    message: "Assignment created successfully",
+    assignment
+  });
 });
+
+
 
 
 // UPDATE ASSIGNMENT
@@ -97,13 +99,16 @@ const updateAssignment = asyncHandler(async (req, res) => {
     throw new Error("Assignment not found");
   }
 
+
   // Ensure lecturer owns the course this assignment belongs to
-  const course = await Course.findOne({
-    _id: assignment.coursesId,
-    assignedLecturer: req.user.id,
+  const lecturerAssignment = await LecturerCourseAssignment.findOne({
+    lecturer: req.user._id,
+     course: assignment.courses,
+     semester: assignment.semester,
+     session: assignment.session
   });
 
-  if (!course) {
+  if (!lecturerAssignment) {
     res.status(403);
     throw new Error("You cannot update an assignment for a course you are not assigned to.");
   }
@@ -114,7 +119,10 @@ const updateAssignment = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-  res.status(200).json(updatedAssignment);
+  res.status(200).json({
+    updatedAssignment,
+    message:"assignment updated"
+  });
 });
 
 
@@ -134,12 +142,15 @@ const deleteAssignment = asyncHandler(async (req, res) => {
   }
 
   // Ensure lecturer owns the course
-  const course = await Course.findOne({
-    _id: assignment.coursesId,
-    assignedLecturer: req.user.id,
+  const lecturerAssignment = await LecturerCourseAssignment.findOne({
+    lecturer: req.user._id,
+     course: assignment.courses,
+     semester: assignment.semester,
+     session: assignment.session
   });
 
-  if (!course) {
+
+  if (!lecturerAssignment) {
     res.status(403);
     throw new Error("You cannot delete an assignment for a course you are not assigned to.");
   }
@@ -154,7 +165,7 @@ const deleteAssignment = asyncHandler(async (req, res) => {
 
 module.exports = {
   getAssignments,
-  createAssignment,
+ createStudentAssignment,
   updateAssignment,
   deleteAssignment
 };
